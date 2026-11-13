@@ -4057,7 +4057,14 @@ window.GF_PRODUCTS = window.GF_PRODUCTS || [];
     var rating=(42+h%7)/10, buyers=80+h%920;
     var tags=p.tags||[];
     var tag=tags.indexOf('beginner')>=0?'👍 Easy for beginners':tags.indexOf('popular')>=0?'🔥 Bestseller':'';
+    if(h%7===0) tag='⚡ Selling fast'; // scarcity on ~1/7 of cards
     return '★'+rating.toFixed(1)+' · '+buyers+'+ bought'+(tag?' · '+tag:'');
+  }
+  // Savings framing for living products — "₹39 today = a season of food".
+  function saveFor(p){
+    if(!isLivingCat(p.cat)) return '';
+    var est = p.cat==='saplings' ? '₹300–800' : '₹150–500';
+    return '<div class="prod-save">💰 Grows ~'+est+' of food / season</div>';
   }
   function bgFor(p){
     var cfg=(window.GF_SHOP_CONFIG && window.GF_SHOP_CONFIG.cardGradients) || {
@@ -4100,6 +4107,7 @@ window.GF_PRODUCTS = window.GF_PRODUCTS || [];
       +     '<div class="product-name">'+p.name+'</div>'
       +     '<div class="product-desc">'+(p.desc||'')+'</div>'
       +     '<div class="prod-proof">'+proofFor(p)+'</div>'
+      +     saveFor(p)
       +     '<div class="product-footer">'
       +       '<div><div class="price-now">₹'+p.price+'</div>'
       +       (p.old && p.old>p.price ? '<div class="price-old">₹'+p.old+'</div>' : '')
@@ -5076,3 +5084,13 @@ document.addEventListener('DOMContentLoaded',function(){
     el.textContent=Math.floor(s/3600)+'h '+String(Math.floor(s%3600/60)).padStart(2,'0')+'m '+String(s%60).padStart(2,'0')+'s';};
   tick();setInterval(tick,1000);
 });
+
+/* WhatsApp share — organic growth loop on the success screen */
+window.shareOrderWA = function(){
+  const amt = document.getElementById('order-paid')?.textContent || '';
+  const oid = document.getElementById('order-id')?.textContent || '';
+  const txt = '🌱 Just ordered ' + (amt||'fresh plants') + ' of seeds & saplings from GrowFresh ' + (oid? '('+oid+') ':'') +
+    '— growing my own tomatoes, coriander & chillies on the balcony. Fresh, organic, and it pays for itself! Try it: ' +
+    (location.origin.includes('github.io') ? location.origin + location.pathname.replace(/[^/]*$/, 'growfresh-app.html') : 'https://rjarupula1729.github.io/nectra-gf/growfresh-app.html');
+  window.open('https://wa.me/?text=' + encodeURIComponent(txt), '_blank');
+};

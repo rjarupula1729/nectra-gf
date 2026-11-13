@@ -690,3 +690,22 @@ body{top:0!important;position:static!important;}
 /* Screen transitions — subtle app-like feel */
 .screen.active{animation:fadeSlide .22s ease;}
 @keyframes fadeSlide{from{opacity:.35;transform:translateY(8px);}to{opacity:1;transform:none;}}
+
+/* ── Marketing layer — savings framing + staples + social proof ── */
+.prod-save{font-size:9px;font-weight:900;color:var(--green);margin-top:2px;letter-spacing:.2px;}
+
+/* staples rail — "never buy these again" */
+.staple-card{background:var(--white);border-radius:var(--radius);padding:10px;flex-shrink:0;min-width:96px;box-shadow:var(--shadow-sm);cursor:pointer;text-align:center;transition:transform .15s ease;}
+.staple-card:active{transform:scale(.94);}
+.staple-emoji{font-size:26px;}
+.staple-name{font-size:11px;font-weight:900;color:var(--text);margin-top:4px;line-height:1.1;}
+.staple-save{font-size:9px;font-weight:800;color:var(--green);margin-top:3px;}
+
+/* testimonial cards */
+.testi-card{background:var(--white);border-radius:var(--radius);padding:11px 12px;flex-shrink:0;min-width:200px;max-width:220px;box-shadow:var(--shadow-sm);border-left:3px solid var(--green);}
+.testi-text{font-size:11px;font-weight:700;color:var(--text);line-height:1.45;}
+.testi-who{font-size:9px;font-weight:800;color:var(--muted);margin-top:6px;}
+
+/* WhatsApp share button (success screen) */
+.share-btn{width:100%;margin-top:12px;padding:13px;background:#25D366;color:#fff;border:none;border-radius:var(--radius);font:900 14px 'Nunito',sans-serif;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;box-shadow:0 4px 12px rgba(37,211,102,.35);transition:transform .12s ease;}
+.share-btn:active{transform:scale(.96);}
