@@ -2056,7 +2056,7 @@ function escapeHtml(s){return String(s||'').replace(/[&<>"']/g,c=>({'&':'&amp;',
         productId: byName[(c.name||'').toLowerCase()],
         quantity:  c.qty,
       })).filter(i => i.productId);
-      if (!apiItems.length) { console.warn('[gf-api] no matching products on server'); return; }
+      if (!apiItems.length) { console.warn('[gf-api] no matching products on server'); if(typeof showToast==='function')showToast('⚠️ Order saved locally — will sync to backend shortly'); return; }
       const paid = Boolean(window._paymentRef);
       const prof = JSON.parse(localStorage.getItem('userProfile')||'{}');
       const order = await api('/api/orders', { method:'POST', body:{
