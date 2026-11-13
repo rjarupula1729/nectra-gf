@@ -1,718 +1,162 @@
-# 🌱 GrowFresh# 🌱 GrowFresh - Agricultural E-Commerce Mobile App# 🌱 GrowFresh - Agriculture E-Commerce App# 🌱 GrowFresh - Complete Application
+# 🌱 GrowFresh — Home Gardening Commerce
 
+Mobile-first e-commerce app for seeds, saplings, tools, compost and garden
+accessories — with OTP login, cart, UPI payments, order fulfilment and a
+live ops dashboard.
 
+**Live web app:** https://rjarupula1729.github.io/nectra-gf/growfresh-app.html
+**Ops dashboard:** https://rjarupula1729.github.io/nectra-gf/admin.html
 
-Mobile-first home gardening + ecommerce app.
-
-**Stack:** React Native (Expo SDK 51) · Node/Express · PostgreSQL (Knex).
-
-**Build & Run on Your Android Phone in Minutes!**
-
----
-
-
-
-## Quick links
-
----Simple app to buy and sell agriculture products online.**A mobile application that empowers users to grow their own vegetables at home with quality products, expert guidance, and community support.**
-
-| I want to… | Read this |
-
-| --- | --- |
-
-| Run the project locally (one command) | `scripts/dev-up.sh` |
-
-| Understand the backend / database | [`backend/MIGRATION_TO_POSTGRES.md`](backend/MIGRATION_TO_POSTGRES.md) |## 🚀 QUICK START (Choose One)
-
-| Ship the app to Play Store testers | [`PLAY_STORE_RELEASE.md`](PLAY_STORE_RELEASE.md) |
-
-| See the privacy policy | [`PRIVACY_POLICY.md`](PRIVACY_POLICY.md) |
-
-| Preview the marketing landing page | open `growfresh-app.html` |
-
-### ✅ **BEST: Cloud Build (Recommended)**## 🚀 Quick Start (Android)---
+**Stack:** Static web SPA (GitHub Pages) · React Native/Expo app ·
+Node/Express API · PostgreSQL (Knex).
 
 ---
 
+## System overview
 
+```
+ Customer phone/browser                 Backend (Render/local)            Ops team
+┌──────────────────────┐          ┌─────────────────────────┐      ┌──────────────────┐
+│ growfresh-app.html   │  HTTPS   │  Express API :5000      │      │  admin.html      │
+│  (GitHub Pages)      ├─────────▶│  Postgres (Knex)        │◀─────┤  (GitHub Pages)  │
+│  shop/cart/garden/   │  /api/*  │  users·products·orders  │ poll │  ADMIN_TOKEN     │
+│  profile (5 pages)   │          │  otps·transactions      │ 15s  │  status updates  │
+└──────────────────────┘          └───────────┬─────────────┘      └──────────────────┘
+                                              │ NOTIFY_WEBHOOK_URL
+                                              ▼
+                                       Slack/Discord alert
+                                       on every new order
+```
+
+The web app is static files on GitHub Pages; all state lives in Postgres
+via the API. `shared/gf-config.js` is the single place that points the app
+at the backend (`window.GF_API`). With no reachable backend the app
+silently falls back to demo mode (local-only, OTP `1234`, mock payments).
+
+---
+
+## User flow — login to delivered
+
+| # | Step | What happens |
+|---|------|--------------|
+| 1 | **Login (mobile + OTP)** | `POST /api/auth/send-otp` issues a 4-digit OTP (hashed, 5-min TTL, max 5 attempts) sent via the configured `SMS_PROVIDER`. Customer enters it → `POST /api/auth/verify-otp` → JWT stored in `localStorage`. |
+| 2 | **Browse / search** | 200+ product catalog, category chips, search. Every `product_view`, `add_to_cart`, `screen_view` is logged to `activity_events` and feeds the Smart-Picks rail. |
+| 3 | **Cart → checkout** | Cart badge + summary → "Proceed to Pay" opens the UPI screen with total (free delivery ≥ ₹499). |
+| 4 | **Pay** | Three modes, picked automatically: **(a)** `RAZORPAY_KEY_*` set → real Razorpay Checkout, order placed only after server-side signature verify; **(b)** `GF_UPI_VPA` set → PhonePe/GPay deep link opens with amount prefilled, customer confirms after paying; **(c)** neither → mock animation (demo). |
+| 5 | **Order created** | `POST /api/orders` — transactional: locks products, validates stock, writes order + line items + transaction, decrements stock, uses the customer's saved profile address. `payment_status` = `Paid` only for a verified gateway ref; COD/UPI-link orders = `Pending`. |
+| 6 | **Ops notified** | `NOTIFY_WEBHOOK_URL` POSTs the order (items, total, customer, address) to Slack/Discord instantly; the admin dashboard polls every 15s regardless. |
+| 7 | **Fulfilment** | Ops moves the order through the status machine: `Confirmed → Packed → Out for Delivery → Delivered` (or `Cancelled` from early states). Skips are rejected. |
+| 8 | **Customer tracks** | Orders list in Profile → status reflects what ops set. |
+| 9 | **Plant it** | Garden screen logs `user_plants` rows for grow tracking. |
+
+---
+
+## Ops dashboard (`admin.html`)
+
+1. Open the link, paste the **`ADMIN_TOKEN`** (set in the backend env), Connect.
+2. Stats bar: open orders · orders today · revenue today.
+3. Order cards show id, total, **status badge**, customer name + mobile,
+   payment method/status, item lines, and the delivery address.
+4. Buttons move the order to the next state(s); invalid jumps are blocked
+   server-side. `Pending` payment on UPI-link orders = **verify the credit
+   in your UPI app first**, then pack.
+5. New orders highlight green + flash the tab title; board refreshes
+   every 15 s.
+
+---
+
+## Configuration (`shared/gf-config.js` + backend env)
+
+| Setting | Where | Purpose |
+|---|---|---|
+| `GF_API` | `gf-config.js` | Deployed API base URL, e.g. `https://growfresh-api.onrender.com`. Blank → tries `localhost:5000` → demo mode. `?api=` URL param overrides. |
+| `GF_UPI_VPA` / `GF_UPI_NAME` | `gf-config.js` | Your business UPI ID → enables PhonePe/GPay deep-link payments (no gateway, no fees). Blank → mock payments. |
+| `JWT_SECRET` | backend env | Signs customer tokens (auto-generated on Render). |
+| `ADMIN_TOKEN` | backend env | Guards `/api/admin/*` + order-status endpoint. Generate: `openssl rand -hex 24`. |
+| `SMS_PROVIDER` | backend env | `console` (dev, OTP returned in API response) · `msg91` · `fast2sms` · `twilio`. Fill matching `*_KEY` vars. |
+| `DEMO_OTP` | backend env | Fallback demo code (`1234` in dev). **Unset in production** to disable it. |
+| `RAZORPAY_KEY_ID` / `_SECRET` | backend env | Enables real Razorpay Checkout; `/api/config` advertises it to the client. |
+| `NOTIFY_WEBHOOK_URL` | backend env | Slack/Discord incoming webhook → instant new-order alert. |
+| `DATABASE_URL` / `PG*` | backend env | Postgres connection (Render injects `DATABASE_URL`). |
+| `CORS_ORIGIN` | backend env | Allowed origins; `*` for dev, lock down in prod. |
+
+---
+
+## Local development
+
+```bash
+# 1. database (Homebrew postgres@16 or Docker)
+psql -d postgres -c "CREATE DATABASE growfresh"
+
+# 2. backend
+cd backend
+cp .env.example .env          # fill PG* / JWT_SECRET / ADMIN_TOKEN
+npm install
+npx knex migrate:latest       # schema (users, products, orders, otps, …)
+npx knex seed:run             # 171 products
+npm start                     # → http://localhost:5000  (/api/health)
+
+# 3. web app (static — any server)
+cd ..
+python3 -m http.server 8090   # → http://localhost:8090/growfresh-app.html
+                              # → http://localhost:8090/admin.html
+```
+
+Quick end-to-end check: login → the OTP hint shows `Dev OTP: XXXX`
+(console provider) → order → see it on `admin.html` with `ADMIN_TOKEN`.
+
+## Deploy
+
+- **Web app** — already on GitHub Pages (`Settings → Pages → main / root`).
+- **API + DB** — Render Blueprint: `render.com → New → Blueprint →` connect
+  this repo. `render.yaml` provisions the web service (Docker, `backend/`)
+  + free Postgres and wires `DATABASE_URL`. Then set `ADMIN_TOKEN`,
+  `SMS_PROVIDER` keys, `RAZORPAY_*`/`NOTIFY_WEBHOOK_URL` as needed in the
+  Render dashboard, and point `GF_API` in `gf-config.js` at the service URL.
+- Note: Render free tier sleeps after ~15 min idle (first request ~30 s).
+
+---
+
+## Feature flags (hidden-layer system)
+
+Phase-2 features are **preserved in code, hidden behind flags** — flip to
+`true` to re-enable. Web: `shared/gf-features.js` · Native:
+`src/config/features.js`.
+
+`COMMUNITY` · `WELLNESS` · `EXPERTS` · `REWARDS` · `FUTURE_PLANTS` ·
+`EXTRAS` (AI Coach, Analyzer, Calendar, Learn, Kids, Subscriptions, R&D).
+
+## Key API routes
+
+```
+POST /api/auth/send-otp|verify-otp     OTP login (JWT)
+GET  /api/products                   catalog
+POST /api/orders                     create order (TX: items+stock+txn)
+GET  /api/orders · GET /api/orders/:id
+POST /api/payments/razorpay/order|verify
+GET  /api/config                     public client config
+GET  /api/admin/orders · stats       ops queue      [x-admin-token]
+PUT  /api/admin/orders/:id/status    status machine [x-admin-token]
+PUT  /api/orders/:id/status          (legacy)       [x-admin-token]
+GET  /api/health                     liveness
+```
 
 ## Repo layout
 
-```bash
-
+```
+growfresh-app.html + shop/garden/community/profile/admin.html   web app (Pages)
+shared/          gf-app.js (UI logic+API bridge) · gf-config.js (API/UPI)
+                 gf-features.js (flags) · gf-analytics.js (events)
+                 gf-plants.js (recommendations) · gf-db-bundle.js (catalog)
+backend/         Express API · routes/ · middleware/ · db/migrations+seeds
+src/             React Native (Expo) app — same feature set
+render.yaml      Render Blueprint (API + Postgres)
 ```
 
-gworfresh_in/npm install -g eas-cli
-
-├── App.js                  Expo entry point
-
-├── app.json                Expo config (icon, package, version)eas login### **Option 1: Use Expo Go (Easiest)**## 📖 Quick Links
-
-├── eas.json                Build / submit profiles
-
-├── babel.config.jscd ~/Documents/gworfresh_in
-
-├── package.json            App deps
-
-├── assets/                 Icon + splash PNGs (drop your art here)eas build --platform android
-
-├── src/
-
-│   ├── components/         Reusable UI (BrandCard, ScreenHeader, …)```
-
-│   ├── context/            AppContext (auth, cart, user state)
-
-│   ├── navigation/         AppNavigator (bottom tabs + stacks)```bash- 🚀 **[Quick Start Guide](./QUICK_START.md)** - Get running in 30 minutes
-
-│   ├── screens/            Home, Shop, Cart, Garden, Community, Profile, …
-
-│   ├── services/api.js     Axios client (reads extra.apiUrl)⏱️ **15-30 min** → Real APK sent to your email → Install on phone ✅
-
-│   └── utils/              colors, theme, storage helpers
-
-├── backend/                Node/Express + Postgres API# Install Expo CLI- 📱 **[Local Testing Guide](./LOCAL_TESTING_GUIDE.md)** - Detailed setup instructions
-
-│   ├── server.js
-
-│   ├── routes/             auth, products, orders, garden, community,---
-
-│   │                        analytics, instructors, cart
-
-│   ├── db/migrations/      Knex SQL migrationsnpm install -g expo-cli- 🎬 **[Visual Walkthrough](./VISUAL_WALKTHROUGH.md)** - See what to expect
-
-│   ├── db/seeds/           Demo data
-
-│   ├── Dockerfile          Production container### ⚡ **FAST: Expo Go (Instant Testing)**
-
-│   └── MIGRATION_TO_POSTGRES.md
-
-├── render.yaml             One-click Render.com deploy (DB + API)- 📊 **[Project Summary](./PROJECT_SUMMARY.md)** - Features & architecture
-
-├── scripts/dev-up.sh       Spin up local Postgres + API + Expo
-
-└── growfresh-app.html      Static marketing/landing page```bash
-
-```
-
-npm install -g expo-cli# Go to app directory
-
----
-
-cd src
-
-## Local dev (TL;DR)
-
-expo startcd src---
-
-```bash
-
-# Prereqs: Node 18+, Docker, Xcode/Android Studio (or Expo Go on phone)# Scan QR code with Expo Go app (free from Play Store)
-
-
-
-# 1. clone + bootstrap everything```
-
-git clone <repo> gworfresh_in && cd gworfresh_in
-
-./scripts/dev-up.sh
-
-
-
-# Expo dev server opens automatically. Scan QR with Expo Go.⏱️ **2 min** → Test features instantly (no APK needed)# Start the app## ✨ What's Included
-
-# Demo OTP is 1234 for any mobile number.
-
-```
-
-
-
-Manual steps if you don't want Docker:---expo start
-
-
-
-```bash
-
-# Postgres
-
-brew install postgresql@16 && brew services start postgresql@16### 💻 **LOCAL: Build on Your Computer**### Backend (Node.js + Express + MongoDB)
-
-createdb growfresh
-
-
-
-# Backend
-
-cd backend```bash# On your phone:- ✅ 7 RESTful API routes with 25+ endpoints
-
-cp .env.example .env
-
-npm installnpm install -g eas-cli
-
-npm run db:migrate && npm run db:seed
-
-npm run deveas build --platform android --local# 1. Install "Expo Go" app from Play Store- ✅ User authentication (WhatsApp-style OTP)
-
-
-
-# Mobile (in a second tab)```
-
-cd ..
-
-npm install# 2. Scan the QR code shown in terminal- ✅ Product catalog with categories
-
-npx expo start
-
-```⏱️ **30-60 min** → APK file created locally
-
-
-
----# 3. App opens instantly!- ✅ Shopping cart & order management
-
-
-
-## What's where in the API---
-
-
-
-| Path | File |```- ✅ Plant tracking system
-
-| --- | --- |
-
-| `POST /api/auth/verify-otp` | `backend/routes/auth.js` |## 📱 FEATURES
-
-| `GET  /api/products` | `backend/routes/products.js` |
-
-| `POST /api/orders` | `backend/routes/orders.js` (TX-wrapped) |- ✅ Instructor booking
-
-| `GET  /api/garden` | `backend/routes/garden.js` |
-
-| `GET  /api/community` | `backend/routes/community.js` |✅ Product listing with images  
-
-| `GET  /api/analytics/me/insights` | `backend/routes/analytics.js` |
-
-✅ Shopping cart  ### **Option 2: Build APK for Android**- ✅ Community forum
-
-Full schema (12 tables + 2 analytical views) lives in
-
-`backend/db/migrations/20260516000001_init.js`.✅ User login  
-
-
-
----✅ Order placement  - ✅ Reward points system
-
-
-
-## Status✅ Beautiful UI  
-
-
-
-- ✅ React Native UI (9 screens) refactored onto shared design system```bash- ✅ Stock management
-
-- ✅ Backend migrated MongoDB → PostgreSQL (relational + analytics)
-
-- ✅ Production-hardened server (helmet, rate-limit, CORS allowlist)---
-
-- ✅ EAS build profiles for internal + production tracks
-
-- ✅ Render.com one-click deploy for backend# Install EAS CLI
-
-- 🔜 Drop real `assets/icon.png` + `assets/splash.png`
-
-- 🔜 First Play Store internal-testing build (`npm run build:internal`)## 📖 DETAILED GUIDES
-
-
-
-See [`PLAY_STORE_RELEASE.md`](PLAY_STORE_RELEASE.md) for the fullnpm install -g eas-cli### Frontend (React Native + Expo)
-
-ship-it checklist.
-
-👉 **[Android Build Complete Guide](./ANDROID_BUILD_GUIDE.md)**
-
-- ✅ 4 Complete screens built and tested
-
----
-
-# Log in to Expo- ✅ Professional UI design
-
-## 🎯 RECOMMENDED STEPS
-
-eas login- ✅ OTP-based authentication
-
-1. **Install EAS CLI:** `npm install -g eas-cli`
-
-2. **Create Free Expo Account:** `eas login`- ✅ Product browsing with search/filter
-
-3. **Build APK:** `cd ~/Documents/gworfresh_in && eas build --platform android`
-
-4. **Download:** Check email for download link# Build APK- ✅ Shopping cart management
-
-5. **Install:** Download APK and tap to install on phone
-
-6. **Test:** Open app and explore! 🎉eas build --platform android --local- ✅ Checkout with address form
-
-
-
----- ✅ Order placement & confirmation
-
-
-
-## ✨ WHAT YOU GET# Follow the prompts
-
-
-
-- Real Android app (APK file)# APK will be generated---
-
-- No Expo Go needed
-
-- Works offline```
-
-- Installable on any Android phone
-
-- Updates can be delivered over-the-air## 🚀 Quick Start
-
-
-
-------
-
-
-
-## 🛠️ REQUIREMENTS### For Testing Locally
-
-
-
-- Node.js v14+## 📋 What's Inside```bash
-
-- Android 8.0+ on phone
-
-- Free Expo account (for cloud builds)# 1. Install dependencies
-
-
-
----**Frontend:** React Native + Exponpm install
-
-
-
-## 📊 PROJECT STATUS- Product Shop
-
-
-
-✅ Ready for Android  - Shopping Cart# 2. Configure MongoDB (Edit backend/.env)
-
-✅ Production-ready  
-
-✅ All features working  - User LoginMONGODB_URI=mongodb+srv://user:password@cluster.mongodb.net/growfresh
-
-
-
----- Clean UI
-
-
-
-## 🔗 LINKS# 3. Start backend
-
-
-
-- [Expo Documentation](https://docs.expo.dev)**Backend:** Node.js + Expressnpm start
-
-- [EAS Build Docs](https://docs.expo.dev/build/setup/)
-
-- [GitHub Repository](https://github.com/rjarupula1729/gworfresh_in)- Product API
-
-
-
----- User Authentication# 4. Start frontend (new terminal)
-
-
-
-**Version:** 1.0.0  - Cart Managementexpo start
-
-**Status:** ✅ Ready to Build & Deploy to Android
-
-
-
-Start building now! 🚀
-
-**Database:** MongoDB# 5. Choose your platform
-
-- Product data# - Press 'a' for Android emulator
-
-- User data# - Press 'i' for iOS simulator
-
-- Orders# - Press 'w' for web
-
-```
-
----
-
-### Test Login
-
-## 🔧 Backend Setup- Mobile: Any 10-digit number (e.g., 9876543210)
-
-- OTP: 1234 (demo)
-
-```bash
-
-# Go to backend---
-
-cd backend
-
-## 📁 Project Structure
-
-# Install dependencies
-
-npm install```
-
-gworfresh_in/
-
-# Create .env file├── backend/          (Node.js + Express + MongoDB)
-
-NODE_ENV=development│   ├── models/       (6 Database collections)
-
-PORT=5000│   ├── routes/       (7 API routes)
-
-MONGODB_URI=mongodb://localhost:27017/growfresh│   └── server.js
-
-JWT_SECRET=your_secret_key├── src/              (React Native)
-
-│   ├── screens/      (4 Complete screens)
-
-# Start server│   ├── context/      (State management)
-
-npm start│   └── services/     (API integration)
-
-├── QUICK_START.md    (30-minute setup)
-
-# API runs on: http://localhost:5000├── LOCAL_TESTING_GUIDE.md
-
-```└── VISUAL_WALKTHROUGH.md
-
-```
-
----
-
----
-
-## 📁 Project Structure
-
-## 🎯 Features
-
-```
-
-gworfresh_in/### Completed ✅
-
-├── src/                    # React Native frontend- WhatsApp-style OTP login
-
-│   ├── App.js- Home with categories & featured products
-
-│   ├── screens/           # Home, Shop, Cart, etc- Shop with search & category filter
-
-│   ├── services/api.js    # API calls- Product details view
-
-│   └── app.json          # Expo config- Shopping cart management
-
-├── backend/               # Node.js backend- Checkout with address form
-
-│   ├── server.js- Order placement & confirmation
-
-│   ├── models/           # Database schemas- Reward points system
-
-│   ├── routes/           # API endpoints- Persistent session storage
-
-│   └── config/db.js      # Database connection
-
-└── package.json### In Development 🏗️
-
-```- Plant tracking screen
-
-- Community forum
-
----- Instructor booking
-
-
-
-## 🛒 Features---
-
-
-
-✅ Product listing## 🧪 How to Test
-
-✅ Shopping cart
-
-✅ User loginSee **[QUICK_START.md](./QUICK_START.md)** for step-by-step testing guide.
-
-✅ Order management
-
-✅ Simple and clean UIQuick checklist:
-
-- [ ] Backend running
-
----- [ ] MongoDB connected
-
-- [ ] Frontend running
-
-## 📱 Test on Android- [ ] Login works
-
-- [ ] Products display
-
-### **Easiest Way (Expo Go)**- [ ] Add to cart works
-
-1. Install Expo Go from Play Store- [ ] Order placement succeeds
-
-2. Scan QR code
-
-3. Done! ✨---
-
-
-
-### **Standalone APK**## 📱 API Endpoints
-
-1. Run `eas build --platform android --local`
-
-2. Download APKAll backend APIs ready:
-
-3. Install on phone- `POST /auth/verify-otp` - Login
-
-4. Open app- `GET /products` - List products
-
-- `GET /products/:id` - Product details
-
----- `POST /orders` - Place order
-
-- `GET /orders` - View orders
-
-## 🌐 API Endpoints- `POST /garden` - Track plants
-
-- And more...
-
-```
-
-GET    /api/products          - Get all productsSee [LOCAL_TESTING_GUIDE.md](./LOCAL_TESTING_GUIDE.md) for complete API list.
-
-POST   /api/auth/login        - User login
-
-POST   /api/cart              - Add to cart---
-
-GET    /api/cart              - View cart
-
-POST   /api/orders            - Create order## 🔐 Security
-
-```
-
-- JWT authentication (30-day expiry)
-
----- Protected API routes
-
-- Input validation
-
-## ⚙️ Configuration- Secure token storage
-
-
-
-Edit `src/services/api.js`:---
-
-```javascript
-
-const API_URL = 'http://YOUR_BACKEND_URL:5000/api';## 💻 Tech Stack
-
-```
-
-| Layer | Technology |
-
----|-------|------------|
-
-| Backend | Node.js, Express, MongoDB |
-
-## 🤝 Contributing| Frontend | React Native, Expo |
-
-| State | Context API |
-
-Feel free to add features, fix bugs, or improve UI!| HTTP | Axios |
-
-| Auth | JWT |
-
----
-
----
-
-## 📝 License
-
-## 📊 Project Status
-
-Open source - use freely!
-
-| Component | Status |
-
----|-----------|--------|
-
-| Database | ✅ Complete |
-
-**Ready to test? Start with Expo Go!** 🚀| Backend APIs | ✅ Complete |
-
-| Login Screen | ✅ Complete |
-| Home Screen | ✅ Complete |
-| Shop Screen | ✅ Complete |
-| Cart & Checkout | ✅ Complete |
-| Plant Tracking | ⏳ In Progress |
-| Community | ⏳ In Progress |
-| Instructors | ⏳ In Progress |
-
----
-
-## 🚀 Getting Started
-
-### Step 1: Setup Backend
-```bash
-npm install
-# Edit backend/.env with MongoDB URI
-npm start
-```
-
-### Step 2: Setup Frontend
-```bash
-# In new terminal
-expo start
-# Press 'a' for Android or 'i' for iOS
-```
-
-### Step 3: Test
-- Login with any mobile number
-- Browse products
-- Add to cart
-- Place order
-
----
-
-## 🐛 Troubleshooting
-
-**Backend won't start?**
-- Check if MongoDB URI is correct in `.env`
-- Verify port 5000 is free
-- Run `npm install` again
-
-**Frontend shows blank screen?**
-- Run `expo start --clear`
-- Check API URL in `src/services/api.js`
-
-**Cannot reach backend?**
-- Android Emulator: Use `http://10.0.2.2:5000/api`
-- Device: Use your PC's IP address
-
-See [LOCAL_TESTING_GUIDE.md](./LOCAL_TESTING_GUIDE.md) for more help.
-
----
-
-## 📚 Documentation
-
-- **[QUICK_START.md](./QUICK_START.md)** - 30-minute setup
-- **[LOCAL_TESTING_GUIDE.md](./LOCAL_TESTING_GUIDE.md)** - Detailed testing
-- **[VISUAL_WALKTHROUGH.md](./VISUAL_WALKTHROUGH.md)** - See what to expect
-- **[PROJECT_SUMMARY.md](./PROJECT_SUMMARY.md)** - Full feature list
-
----
-
-## MongoDB Setup
-
-Backend database is MongoDB. You can use:
-
-**Option 1: MongoDB Atlas (Cloud - Recommended)**
-- Go to https://www.mongodb.com/cloud/atlas
-- Create free cluster
-- Get connection string
-- Add to `.env`
-
-**Option 2: Local MongoDB**
-- Download from https://www.mongodb.com/try/download/community
-- Start service
-- Use `mongodb://localhost:27017/growfresh`
-
----
-
-## 🎯 Next Steps
-
-1. **Follow QUICK_START.md** for local setup
-2. **Test all features** using the app
-3. **Document findings** in test report
-4. **Deploy backend** to cloud (Heroku/AWS)
-5. **Build & publish** frontend to Play Store
-
----
-
-## 📝 Test Report
-
-Document your testing in a `TEST_REPORT.md` file:
-
-```markdown
-# Test Results - [Date]
-
-## Environment
-- Backend: Running
-- Frontend: Expo on Android/iOS
-- Database: MongoDB Atlas
-
-## Test Results
-- [ ] Login works
-- [ ] Products load
-- [ ] Search works
-- [ ] Add to cart works
-- [ ] Order places
-- [ ] No errors
-
-## Issues
-- None / List any issues found
-```
-
----
-
-## ✨ Key Features
-
-🌱 **For Users**
-- Easy shopping interface
-- Order tracking
-- Plant progress tracking
-- Community support
-- Expert consultations
-
-💼 **For Business**
-- Inventory management
-- Customer engagement
-- Loyalty rewards
-- Growth analytics
-
----
-
-## 🚢 Deployment Ready
-
-Backend can be deployed to:
-- Heroku
-- AWS
-- Google Cloud
-- Azure
-
-Frontend can be distributed as:
-- Android APK
-- iOS App
-- Web version
-
----
-
-## 📞 Support
-
-For help:
-1. Check documentation files
-2. Review console logs
-3. Test with Postman
-4. Verify database connections
-
----
-
-## 📄 License
-
-MIT License - Open for learning and development
-
----
-
-**GrowFresh** - Helping people grow vegetables at home! 🌱
-
-**Version**: 1.0.0 MVP  
-**Status**: Ready for Local Testing ✅  
-**Last Updated**: 28 April 2026
+## More docs
+
+- [`backend/MIGRATION_TO_POSTGRES.md`](backend/MIGRATION_TO_POSTGRES.md) — DB schema & migration notes
+- [`PLAY_STORE_RELEASE.md`](PLAY_STORE_RELEASE.md) — shipping the Android build
+- [`PRIVACY_POLICY.md`](PRIVACY_POLICY.md) — privacy policy
+- [`COMPLETE_PROJECT_GUIDE.md`](COMPLETE_PROJECT_GUIDE.md) — full project guide
+- `scripts/dev-up.sh` — one-command local dev setup
