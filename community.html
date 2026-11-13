@@ -9,7 +9,7 @@
 <link rel="stylesheet" href="shared/gf.css?v=20260519ai">
 <link rel="stylesheet" href="shared/gf-extras.css?v=20260519ai">
 </head>
-<body>
+<body data-feature-page="COMMUNITY">
 <div class="phone">
 <div class="status-bar"><span id="status-time">9:41</span><span>GrowFresh 🌱</span><span>▲▲▲ 🔋</span></div>
 <div class="screen active" id="screen-community">
@@ -109,14 +109,14 @@
     </div>
   </div></div>
 </div>
-<div class="bottom-nav"><a class="nav-item" href="growfresh-app.html" style="text-decoration:none;color:inherit"><div class="nav-icon">🏠</div><div class="nav-label">Home</div></a><a class="nav-item" href="shop.html" style="text-decoration:none;color:inherit"><div class="nav-icon">🛒</div><div class="nav-label">Shop</div></a><a class="nav-item" href="garden.html" style="text-decoration:none;color:inherit"><div class="nav-icon">🌿</div><div class="nav-label">Garden</div></a><a class="nav-item active" href="community.html" style="text-decoration:none;color:inherit"><div class="nav-icon">👥</div><div class="nav-label">Community</div></a><a class="nav-item" href="profile.html" style="text-decoration:none;color:inherit"><div class="nav-icon">👤</div><div class="nav-label">Profile</div></a></div>
+<div class="bottom-nav"><a class="nav-item" href="growfresh-app.html" style="text-decoration:none;color:inherit"><div class="nav-icon">🏠</div><div class="nav-label">Home</div></a><a class="nav-item" href="shop.html" style="text-decoration:none;color:inherit"><div class="nav-icon">🛒</div><div class="nav-label">Shop</div></a><a class="nav-item" href="garden.html" style="text-decoration:none;color:inherit"><div class="nav-icon">🌿</div><div class="nav-label">Garden</div></a><a class="nav-item active" data-feature="COMMUNITY" href="community.html" style="text-decoration:none;color:inherit"><div class="nav-icon">👥</div><div class="nav-label">Community</div></a><a class="nav-item" href="profile.html" style="text-decoration:none;color:inherit"><div class="nav-icon">👤</div><div class="nav-label">Profile</div></a></div>
 </div><!-- /phone -->
 <!-- GLOBAL BOTTOM NAV — always visible on every page -->
 <div class="bottom-nav" id="globalBottomNav" style="display:none">
   <div class="nav-item" data-tab="home" onclick="switchTab('home')"><div class="nav-icon">🏠</div><div class="nav-label">Home</div></div>
   <div class="nav-item" data-tab="shop" onclick="switchTab('shop')"><div class="nav-icon">🛒</div><div class="nav-label">Shop</div></div>
   <div class="nav-item" data-tab="garden" onclick="switchTab('garden')"><div class="nav-icon">🌿</div><div class="nav-label">Garden</div></div>
-  <div class="nav-item" data-tab="community" onclick="switchTab('community')"><div class="nav-icon">👥</div><div class="nav-label">Community</div></div>
+  <div class="nav-item" data-tab="community" data-feature="COMMUNITY" onclick="switchTab('community')"><div class="nav-icon">👥</div><div class="nav-label">Community</div></div>
   <div class="nav-item" data-tab="profile" onclick="switchTab('profile')"><div class="nav-icon">👤</div><div class="nav-label">Profile</div></div>
 </div>
 
@@ -388,6 +388,6 @@
 <!-- Implements the M(i,j) compatibility matrix from the Mathematical Ecology -->
 <!-- Blueprint. When user taps a product image, we show a popup with         -->
 <!-- ecologically-compatible plants that thrive together (self-sustaining).  -->
-<script src="shared/gf-db-bundle.js?v=20260519ai"></script><script src="shared/gf-plants.js?v=20260519ai"></script><script src="shared/gf-app.js?v=20260519ai"></script>
+<script src="shared/gf-features.js?v=20260519ai"></script><script src="shared/gf-db-bundle.js?v=20260519ai"></script><script src="shared/gf-plants.js?v=20260519ai"></script><script src="shared/gf-app.js?v=20260519ai"></script>
 </body>
 </html>

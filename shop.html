@@ -43,7 +43,7 @@
     <div id="cart-items-list"></div>
     <div style="display:flex;gap:8px;margin:8px 0">
       <button onclick="showScreen('wishlist')" style="flex:1;padding:10px;background:var(--white);color:var(--red);border:1.5px dashed var(--red-pale);border-radius:10px;font:800 11px 'Nunito',sans-serif;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px">❤️ Wishlist <span id="cart-wishlist-count" style="background:var(--red);color:#fff;border-radius:10px;padding:1px 7px;font-size:10px;font-weight:900">0</span></button>
-      <button onclick="showScreen('future')" style="flex:1;padding:10px;background:var(--white);color:var(--green-deep);border:1.5px dashed var(--green-pale);border-radius:10px;font:800 11px 'Nunito',sans-serif;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px">🌱 Future <span id="cart-future-count" style="background:var(--green);color:#fff;border-radius:10px;padding:1px 7px;font-size:10px;font-weight:900">0</span></button>
+      <button data-feature="FUTURE_PLANTS" onclick="showScreen('future')" style="flex:1;padding:10px;background:var(--white);color:var(--green-deep);border:1.5px dashed var(--green-pale);border-radius:10px;font:800 11px 'Nunito',sans-serif;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px">🌱 Future <span id="cart-future-count" style="background:var(--green);color:#fff;border-radius:10px;padding:1px 7px;font-size:10px;font-weight:900">0</span></button>
     </div>
     <div class="delivery-note">🚚 Free delivery above ₹499 · 2–4 hrs · Hyderabad</div>
     <div class="cart-summary"><div class="summary-row"><span>Subtotal</span><span id="summary-sub">₹0</span></div><div class="summary-row"><span>Delivery</span><span id="summary-delivery">₹49</span></div><div class="summary-row total"><span>Total</span><span id="summary-total">₹0</span></div></div>
@@ -102,14 +102,14 @@
     <div class="redirect-note">Redirecting to home in 3 seconds...</div>
   </div>
 </div>
-<div class="bottom-nav"><a class="nav-item" href="growfresh-app.html" style="text-decoration:none;color:inherit"><div class="nav-icon">🏠</div><div class="nav-label">Home</div></a><a class="nav-item active" href="shop.html" style="text-decoration:none;color:inherit"><div class="nav-icon">🛒</div><div class="nav-label">Shop</div></a><a class="nav-item" href="garden.html" style="text-decoration:none;color:inherit"><div class="nav-icon">🌿</div><div class="nav-label">Garden</div></a><a class="nav-item" href="community.html" style="text-decoration:none;color:inherit"><div class="nav-icon">👥</div><div class="nav-label">Community</div></a><a class="nav-item" href="profile.html" style="text-decoration:none;color:inherit"><div class="nav-icon">👤</div><div class="nav-label">Profile</div></a></div>
+<div class="bottom-nav"><a class="nav-item" href="growfresh-app.html" style="text-decoration:none;color:inherit"><div class="nav-icon">🏠</div><div class="nav-label">Home</div></a><a class="nav-item active" href="shop.html" style="text-decoration:none;color:inherit"><div class="nav-icon">🛒</div><div class="nav-label">Shop</div></a><a class="nav-item" href="garden.html" style="text-decoration:none;color:inherit"><div class="nav-icon">🌿</div><div class="nav-label">Garden</div></a><a class="nav-item" data-feature="COMMUNITY" href="community.html" style="text-decoration:none;color:inherit"><div class="nav-icon">👥</div><div class="nav-label">Community</div></a><a class="nav-item" href="profile.html" style="text-decoration:none;color:inherit"><div class="nav-icon">👤</div><div class="nav-label">Profile</div></a></div>
 </div><!-- /phone -->
 <!-- GLOBAL BOTTOM NAV — always visible on every page -->
 <div class="bottom-nav" id="globalBottomNav" style="display:none">
   <div class="nav-item" data-tab="home" onclick="switchTab('home')"><div class="nav-icon">🏠</div><div class="nav-label">Home</div></div>
   <div class="nav-item" data-tab="shop" onclick="switchTab('shop')"><div class="nav-icon">🛒</div><div class="nav-label">Shop</div></div>
   <div class="nav-item" data-tab="garden" onclick="switchTab('garden')"><div class="nav-icon">🌿</div><div class="nav-label">Garden</div></div>
-  <div class="nav-item" data-tab="community" onclick="switchTab('community')"><div class="nav-icon">👥</div><div class="nav-label">Community</div></div>
+  <div class="nav-item" data-tab="community" data-feature="COMMUNITY" onclick="switchTab('community')"><div class="nav-icon">👥</div><div class="nav-label">Community</div></div>
   <div class="nav-item" data-tab="profile" onclick="switchTab('profile')"><div class="nav-icon">👤</div><div class="nav-label">Profile</div></div>
 </div>
 
@@ -381,6 +381,6 @@
 <!-- Implements the M(i,j) compatibility matrix from the Mathematical Ecology -->
 <!-- Blueprint. When user taps a product image, we show a popup with         -->
 <!-- ecologically-compatible plants that thrive together (self-sustaining).  -->
-<script src="shared/gf-db-bundle.js?v=20260519ai"></script><script src="shared/gf-plants.js?v=20260519ai"></script><script src="shared/gf-app.js?v=20260519ai"></script>
+<script src="shared/gf-features.js?v=20260519ai"></script><script src="shared/gf-db-bundle.js?v=20260519ai"></script><script src="shared/gf-plants.js?v=20260519ai"></script><script src="shared/gf-app.js?v=20260519ai"></script>
 </body>
 </html>

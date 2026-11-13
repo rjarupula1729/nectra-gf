@@ -8,4 +8,7 @@ export const FEATURES = {
   EXPERTS: false,
   REWARDS: false,
   FUTURE_PLANTS: false,
+  // Non-core extras (AI coach, analyzer, calendar, learn, subs, kids, R&D).
+  // Only surfaced in the web app today; kept for parity with shared/gf-features.js.
+  EXTRAS: false,
 };

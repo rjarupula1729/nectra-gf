@@ -20,9 +20,9 @@
   <div class="splash-feats">
     <div class="splash-feat"><div class="feat-icon">🛒</div><div><div class="feat-title">Order Seeds & Saplings</div><div class="feat-sub">Delivered 2–4 hrs across Hyderabad</div></div></div>
     <div class="splash-feat"><div class="feat-icon">🌿</div><div><div class="feat-title">My Garden Tracker</div><div class="feat-sub">Daily care reminders & growth tracker</div></div></div>
-    <div class="splash-feat"><div class="feat-icon">📸</div><div><div class="feat-title">Space Analyzer</div><div class="feat-sub">AI suggests what fits your balcony</div></div></div>
-    <div class="splash-feat"><div class="feat-icon">👥</div><div><div class="feat-title">Community & Experts</div><div class="feat-sub">Learn, share & book home visits</div></div></div>
-    <div class="splash-feat"><div class="feat-icon">⏱️</div><div><div class="feat-title">WFH Wellness Breaks</div><div class="feat-sub">Micro-tasks between meetings · stress-free workday</div></div></div>
+    <div class="splash-feat" data-feature="EXTRAS"><div class="feat-icon">📸</div><div><div class="feat-title">Space Analyzer</div><div class="feat-sub">AI suggests what fits your balcony</div></div></div>
+    <div class="splash-feat" data-feature="COMMUNITY EXPERTS"><div class="feat-icon">👥</div><div><div class="feat-title">Community & Experts</div><div class="feat-sub">Learn, share & book home visits</div></div></div>
+    <div class="splash-feat" data-feature="WELLNESS"><div class="feat-icon">⏱️</div><div><div class="feat-title">WFH Wellness Breaks</div><div class="feat-sub">Micro-tasks between meetings · stress-free workday</div></div></div>
   </div>
   <button class="splash-btn" onclick="showScreen('login')">Get Started →</button>
 </div>
@@ -116,7 +116,7 @@
     </div>
 
     <!-- ══════ WFH HEALTH CORNER (Phase 1 — Work From Healthy Home) ══════ -->
-    <div class="wfh-corner" onclick="openWfhBreaks()">
+    <div class="wfh-corner" data-feature="WELLNESS" onclick="openWfhBreaks()">
       <div class="wfh-ring" id="wfh-ring" style="--pct:0">
         <div class="wfh-ring-inner">
           <div class="wfh-ring-pct" id="wfh-ring-pct">0%</div>
@@ -130,7 +130,7 @@
       </div>
       <div class="wfh-chip">Go →</div>
     </div>
-    <div class="wfh-breaks">
+    <div class="wfh-breaks" data-feature="WELLNESS">
       <div class="wfh-break" data-task="hydrate"  onclick="event.stopPropagation();logWfhBreak('hydrate', this)"><div class="wfhb-emoji">💧</div><div class="wfhb-lbl">Hydrate</div></div>
       <div class="wfh-break" data-task="sunlight" onclick="event.stopPropagation();logWfhBreak('sunlight', this)"><div class="wfhb-emoji">☀️</div><div class="wfhb-lbl">Sunlight</div></div>
       <div class="wfh-break" data-task="plant"    onclick="event.stopPropagation();logWfhBreak('plant', this)"><div class="wfhb-emoji">🌿</div><div class="wfhb-lbl">Plant Care</div></div>
@@ -138,16 +138,16 @@
       <div class="wfh-break" data-task="meal"     onclick="event.stopPropagation();logWfhBreak('meal', this)"><div class="wfhb-emoji">🥗</div><div class="wfhb-lbl">Fresh Meal</div></div>
     </div>
 
-    <div class="home-quick">
-      <div class="home-qa" onclick="switchTab('calendar')"><div class="qa-icon">📅</div><div class="qa-label">Calendar</div><span class="qa-badge" id="qa-badge-calendar"></span></div>
-      <div class="home-qa" onclick="switchTab('analyzer')"><div class="qa-icon">📸</div><div class="qa-label">Analyzer</div></div>
-      <div class="home-qa" onclick="switchTab('wellness')"><div class="qa-icon">💚</div><div class="qa-label">Wellness</div><span class="qa-badge" id="qa-badge-wellness"></span></div>
-      <div class="home-qa" onclick="switchTab('aicoach')"><div class="qa-icon">🤖</div><div class="qa-label">AI Coach</div><span class="qa-badge" id="qa-badge-aicoach"></span></div>
-      <div class="home-qa" onclick="switchTab('more')"><div class="qa-icon">⋯</div><div class="qa-label">More</div></div>
+    <div class="home-quick" data-feature="EXTRAS WELLNESS">
+      <div class="home-qa" data-feature="EXTRAS" onclick="switchTab('calendar')"><div class="qa-icon">📅</div><div class="qa-label">Calendar</div><span class="qa-badge" id="qa-badge-calendar"></span></div>
+      <div class="home-qa" data-feature="EXTRAS" onclick="switchTab('analyzer')"><div class="qa-icon">📸</div><div class="qa-label">Analyzer</div></div>
+      <div class="home-qa" data-feature="WELLNESS" onclick="switchTab('wellness')"><div class="qa-icon">💚</div><div class="qa-label">Wellness</div><span class="qa-badge" id="qa-badge-wellness"></span></div>
+      <div class="home-qa" data-feature="EXTRAS" onclick="switchTab('aicoach')"><div class="qa-icon">🤖</div><div class="qa-label">AI Coach</div><span class="qa-badge" id="qa-badge-aicoach"></span></div>
+      <div class="home-qa" data-feature="EXTRAS" onclick="switchTab('more')"><div class="qa-icon">⋯</div><div class="qa-label">More</div></div>
     </div>
 
     <!-- BEGINNER ONBOARDING JOURNEY (compact) -->
-    <div onclick="switchTab('learn')" class="brand-card" style="background:var(--grad-primary);margin:10px 14px 0">
+    <div data-feature="EXTRAS" onclick="switchTab('learn')" class="brand-card" style="background:var(--grad-primary);margin:10px 14px 0">
       <div class="bc-icon">🚀</div>
       <div class="bc-body">
         <div class="bc-title">Start Your Journey</div>
@@ -172,7 +172,7 @@
     </div>
 
     <!-- ══════ HEALTHY URBAN LIVING — WFH lifestyle hooks (additive) ══════ -->
-    <div class="home-section">
+    <div class="home-section" data-feature="WELLNESS">
       <div class="section-hdr"><div class="section-title">💚 Healthy Urban Living</div><div class="section-link" onclick="switchTab('wellness')">Explore →</div></div>
       <div style="display:flex;gap:8px;overflow-x:auto;padding-bottom:4px;scrollbar-width:none">
         <div class="urban-card" data-urban="stress" data-pts="15" onclick="openUrbanActivity('stress')" style="background:linear-gradient(135deg,#0288D1,#4FC3F7)">
@@ -554,10 +554,10 @@
     <div style="background:var(--white);border-radius:var(--radius);padding:14px;box-shadow:var(--shadow-sm);margin-bottom:14px">
       <div style="font-size:12px;font-weight:800;margin-bottom:4px">🌱 Gardening Skills</div>
       <div style="background:var(--bg);height:8px;border-radius:4px;overflow:hidden;margin-bottom:10px"><div style="width:65%;height:100%;background:linear-gradient(90deg,var(--green-light),var(--green))"></div></div>
-      <div style="font-size:12px;font-weight:800;margin-bottom:4px">🥗 Healthy Eating</div>
-      <div style="background:var(--bg);height:8px;border-radius:4px;overflow:hidden;margin-bottom:10px"><div style="width:78%;height:100%;background:linear-gradient(90deg,#FB8C00,#FFB74D)"></div></div>
-      <div style="font-size:12px;font-weight:800;margin-bottom:4px">👥 Community</div>
-      <div style="background:var(--bg);height:8px;border-radius:4px;overflow:hidden;margin-bottom:10px"><div style="width:45%;height:100%;background:linear-gradient(90deg,#43A047,#1B5E20)"></div></div>
+      <div data-feature="WELLNESS" style="font-size:12px;font-weight:800;margin-bottom:4px">🥗 Healthy Eating</div>
+      <div data-feature="WELLNESS" style="background:var(--bg);height:8px;border-radius:4px;overflow:hidden;margin-bottom:10px"><div style="width:78%;height:100%;background:linear-gradient(90deg,#FB8C00,#FFB74D)"></div></div>
+      <div data-feature="COMMUNITY" style="font-size:12px;font-weight:800;margin-bottom:4px">👥 Community</div>
+      <div data-feature="COMMUNITY" style="background:var(--bg);height:8px;border-radius:4px;overflow:hidden;margin-bottom:10px"><div style="width:45%;height:100%;background:linear-gradient(90deg,#43A047,#1B5E20)"></div></div>
       <div style="font-size:12px;font-weight:800;margin-bottom:4px">🌍 Sustainability</div>
       <div style="background:var(--bg);height:8px;border-radius:4px;overflow:hidden"><div style="width:82%;height:100%;background:linear-gradient(90deg,#43A047,#1B5E20)"></div></div>
     </div>
@@ -573,12 +573,12 @@
   <div class="page-header"><button class="back-btn" onclick="goBack()">←</button><div class="page-title">More Features</div></div>
   <div class="scroll-body"><div style="padding:14px">
 
-    <div style="font-size:11px;font-weight:900;color:var(--muted);letter-spacing:0.8px;text-transform:uppercase;margin-bottom:10px">🌟 Lifestyle & Wellness</div>
-    <div style="background:var(--white);border-radius:var(--radius);box-shadow:var(--shadow-sm);overflow:hidden;margin-bottom:16px">
-      <div class="profile-row" onclick="showScreen('wellness')"><div class="profile-row-icon">💚</div><div class="profile-row-text"><div class="profile-row-title">Wellness Tracker</div><div class="profile-row-sub">Health score · Water · Sleep · Insurance benefits</div></div><div class="profile-row-arrow">›</div></div>
-      <div class="profile-row" onclick="showScreen('eating')"><div class="profile-row-icon">🥗</div><div class="profile-row-text"><div class="profile-row-title">Healthy Eating</div><div class="profile-row-sub">Recipes · Meal planner · Indian superfoods</div></div><div class="profile-row-arrow">›</div></div>
-      <div class="profile-row" onclick="showScreen('soil')"><div class="profile-row-icon">♻️</div><div class="profile-row-text"><div class="profile-row-title">Soil Health Dashboard</div><div class="profile-row-sub">Compost · Biodiversity · Carbon impact</div></div><div class="profile-row-arrow">›</div></div>
-      <div class="profile-row" onclick="showScreen('rewards')"><div class="profile-row-icon">🎁</div><div class="profile-row-text"><div class="profile-row-title">GrowPoints & Rewards</div><div class="profile-row-sub">Earn points · Redeem · Insurance discounts</div></div><div class="profile-row-arrow">›</div></div>
+    <div data-feature="WELLNESS REWARDS" style="font-size:11px;font-weight:900;color:var(--muted);letter-spacing:0.8px;text-transform:uppercase;margin-bottom:10px">🌟 Lifestyle & Wellness</div>
+    <div data-feature="WELLNESS REWARDS" style="background:var(--white);border-radius:var(--radius);box-shadow:var(--shadow-sm);overflow:hidden;margin-bottom:16px">
+      <div class="profile-row" data-feature="WELLNESS" onclick="showScreen('wellness')"><div class="profile-row-icon">💚</div><div class="profile-row-text"><div class="profile-row-title">Wellness Tracker</div><div class="profile-row-sub">Health score · Water · Sleep · Insurance benefits</div></div><div class="profile-row-arrow">›</div></div>
+      <div class="profile-row" data-feature="WELLNESS" onclick="showScreen('eating')"><div class="profile-row-icon">🥗</div><div class="profile-row-text"><div class="profile-row-title">Healthy Eating</div><div class="profile-row-sub">Recipes · Meal planner · Indian superfoods</div></div><div class="profile-row-arrow">›</div></div>
+      <div class="profile-row" data-feature="WELLNESS" onclick="showScreen('soil')"><div class="profile-row-icon">♻️</div><div class="profile-row-text"><div class="profile-row-title">Soil Health Dashboard</div><div class="profile-row-sub">Compost · Biodiversity · Carbon impact</div></div><div class="profile-row-arrow">›</div></div>
+      <div class="profile-row" data-feature="REWARDS" onclick="showScreen('rewards')"><div class="profile-row-icon">🎁</div><div class="profile-row-text"><div class="profile-row-title">GrowPoints & Rewards</div><div class="profile-row-sub">Earn points · Redeem · Insurance discounts</div></div><div class="profile-row-arrow">›</div></div>
     </div>
 
     <div style="font-size:11px;font-weight:900;color:var(--muted);letter-spacing:0.8px;text-transform:uppercase;margin-bottom:10px">📚 Learn & Grow</div>
@@ -589,7 +589,7 @@
 
     <div style="font-size:11px;font-weight:900;color:var(--muted);letter-spacing:0.8px;text-transform:uppercase;margin-bottom:10px">Stage 5 Features</div>
     <div style="background:var(--white);border-radius:var(--radius);box-shadow:var(--shadow-sm);overflow:hidden;margin-bottom:16px">
-      <div class="profile-row" onclick="showScreen('expert')"><div class="profile-row-icon">👨‍🌾</div><div class="profile-row-text"><div class="profile-row-title">Expert Booking</div><div class="profile-row-sub">Book home visits · Video calls</div></div><div class="profile-row-arrow">›</div></div>
+      <div class="profile-row" data-feature="EXPERTS" onclick="showScreen('expert')"><div class="profile-row-icon">👨‍🌾</div><div class="profile-row-text"><div class="profile-row-title">Expert Booking</div><div class="profile-row-sub">Book home visits · Video calls</div></div><div class="profile-row-arrow">›</div></div>
       <div class="profile-row" onclick="showScreen('calendar')"><div class="profile-row-icon">📅</div><div class="profile-row-text"><div class="profile-row-title">Seasonal Calendar</div><div class="profile-row-sub">Hyderabad month-by-month planting guide</div></div><div class="profile-row-arrow">›</div></div>
       <div class="profile-row" onclick="showScreen('analyzer')"><div class="profile-row-icon">📸</div><div class="profile-row-text"><div class="profile-row-title">Space Analyzer</div><div class="profile-row-sub">AI suggests plants for your space</div></div><div class="profile-row-arrow">›</div></div>
       <div class="profile-row" onclick="showScreen('subs')"><div class="profile-row-icon">📦</div><div class="profile-row-text"><div class="profile-row-title">Monthly Subscriptions</div><div class="profile-row-sub">Auto-delivered garden kits every month</div></div><div class="profile-row-arrow">›</div></div>
@@ -597,21 +597,21 @@
     <div style="font-size:11px;font-weight:900;color:var(--muted);letter-spacing:0.8px;text-transform:uppercase;margin-bottom:10px">Bonus Features</div>
     <div style="background:var(--white);border-radius:var(--radius);box-shadow:var(--shadow-sm);overflow:hidden">
       <div class="profile-row" onclick="showScreen('rd')"><div class="profile-row-icon">🧪</div><div class="profile-row-text"><div class="profile-row-title">R&amp;D Lab · Garden Planner <span style="display:inline-block;font-size:9px;font-weight:900;color:#1565C0;background:#E3F2FD;border:1px solid #BBDEFB;padding:1px 6px;border-radius:999px;margin-left:4px;letter-spacing:.4px;vertical-align:middle">SOON</span></div><div class="profile-row-sub">Geo-adaptive ecology · smart space split · concept preview</div></div><div class="profile-row-arrow">›</div></div>
-      <div class="profile-row" onclick="showToast('🔥 Streak feature in My Garden!')"><div class="profile-row-icon">🔥</div><div class="profile-row-text"><div class="profile-row-title">Garden Streak</div><div class="profile-row-sub">Daily care streak tracker with rewards</div></div><div class="profile-row-arrow">›</div></div>
+      <div class="profile-row" data-feature="REWARDS" onclick="showToast('🔥 Streak feature in My Garden!')"><div class="profile-row-icon">🔥</div><div class="profile-row-text"><div class="profile-row-title">Garden Streak</div><div class="profile-row-sub">Daily care streak tracker with rewards</div></div><div class="profile-row-arrow">›</div></div>
       <div class="profile-row" onclick="showToast('☀️ Weather feature — coming soon!')"><div class="profile-row-icon">☀️</div><div class="profile-row-text"><div class="profile-row-title">Weather Integration</div><div class="profile-row-sub">Smart watering based on Hyderabad weather</div></div><div class="profile-row-arrow">›</div></div>
       <div class="profile-row" onclick="showToast('🏆 Leaderboard — coming soon!')"><div class="profile-row-icon">🏆</div><div class="profile-row-text"><div class="profile-row-title">Grower Leaderboard</div><div class="profile-row-sub">Top growers in Hyderabad this month</div></div><div class="profile-row-arrow">›</div></div>
       <div class="profile-row" onclick="showToast('🤝 Seed Swap — coming soon!')"><div class="profile-row-icon">🤝</div><div class="profile-row-text"><div class="profile-row-title">Seed Swap</div><div class="profile-row-sub">Exchange seeds with your neighbours</div></div><div class="profile-row-arrow">›</div></div>
     </div>
   </div></div>
   </div>
-<div class="bottom-nav"><a class="nav-item active" href="growfresh-app.html" style="text-decoration:none;color:inherit"><div class="nav-icon">🏠</div><div class="nav-label">Home</div></a><a class="nav-item" href="shop.html" style="text-decoration:none;color:inherit"><div class="nav-icon">🛒</div><div class="nav-label">Shop</div></a><a class="nav-item" href="garden.html" style="text-decoration:none;color:inherit"><div class="nav-icon">🌿</div><div class="nav-label">Garden</div></a><a class="nav-item" href="community.html" style="text-decoration:none;color:inherit"><div class="nav-icon">👥</div><div class="nav-label">Community</div></a><a class="nav-item" href="profile.html" style="text-decoration:none;color:inherit"><div class="nav-icon">👤</div><div class="nav-label">Profile</div></a></div>
+<div class="bottom-nav"><a class="nav-item active" href="growfresh-app.html" style="text-decoration:none;color:inherit"><div class="nav-icon">🏠</div><div class="nav-label">Home</div></a><a class="nav-item" href="shop.html" style="text-decoration:none;color:inherit"><div class="nav-icon">🛒</div><div class="nav-label">Shop</div></a><a class="nav-item" href="garden.html" style="text-decoration:none;color:inherit"><div class="nav-icon">🌿</div><div class="nav-label">Garden</div></a><a class="nav-item" data-feature="COMMUNITY" href="community.html" style="text-decoration:none;color:inherit"><div class="nav-icon">👥</div><div class="nav-label">Community</div></a><a class="nav-item" href="profile.html" style="text-decoration:none;color:inherit"><div class="nav-icon">👤</div><div class="nav-label">Profile</div></a></div>
 </div><!-- /phone -->
 <!-- GLOBAL BOTTOM NAV — always visible on every page -->
 <div class="bottom-nav" id="globalBottomNav" style="display:none">
   <div class="nav-item" data-tab="home" onclick="switchTab('home')"><div class="nav-icon">🏠</div><div class="nav-label">Home</div></div>
   <div class="nav-item" data-tab="shop" onclick="switchTab('shop')"><div class="nav-icon">🛒</div><div class="nav-label">Shop</div></div>
   <div class="nav-item" data-tab="garden" onclick="switchTab('garden')"><div class="nav-icon">🌿</div><div class="nav-label">Garden</div></div>
-  <div class="nav-item" data-tab="community" onclick="switchTab('community')"><div class="nav-icon">👥</div><div class="nav-label">Community</div></div>
+  <div class="nav-item" data-tab="community" data-feature="COMMUNITY" onclick="switchTab('community')"><div class="nav-icon">👥</div><div class="nav-label">Community</div></div>
   <div class="nav-item" data-tab="profile" onclick="switchTab('profile')"><div class="nav-icon">👤</div><div class="nav-label">Profile</div></div>
 </div>
 
@@ -893,6 +893,6 @@
 <!-- Implements the M(i,j) compatibility matrix from the Mathematical Ecology -->
 <!-- Blueprint. When user taps a product image, we show a popup with         -->
 <!-- ecologically-compatible plants that thrive together (self-sustaining).  -->
-<script src="shared/gf-db-bundle.js?v=20260519ai"></script><script src="shared/gf-plants.js?v=20260519ai"></script><script src="shared/gf-app.js?v=20260519ai"></script>
+<script src="shared/gf-features.js?v=20260519ai"></script><script src="shared/gf-db-bundle.js?v=20260519ai"></script><script src="shared/gf-plants.js?v=20260519ai"></script><script src="shared/gf-app.js?v=20260519ai"></script>
 </body>
 </html>

@@ -1308,6 +1308,7 @@ function _updateNav(name){
 }
 function showScreen(name,opts){
   opts=opts||{};
+  if(typeof featureOnForTab==='function' && !featureOnForTab(name)) return;
   const cur=document.querySelector('.screen.active');
   const curName=cur?cur.id.replace('screen-',''):null;
   if(!opts.fromBack && curName && curName!==name){_navHistory.push(curName);}
@@ -2374,6 +2375,7 @@ function escapeHtml(s){return String(s||'').replace(/[&<>"']/g,c=>({'&':'&amp;',
       { name:'Edit Profile',   desc:'Update your name & photo',            icon:'✏️', tab:'editprofile',    kw:'edit profile name photo avatar update settings' },
       { name:'More',           desc:'All features',                        icon:'⋯',  tab:'more',           kw:'all everything features menu options' },
     ].filter(function(f){
+      if(typeof featureOnForTab==='function' && !featureOnForTab(f.tab)) return false;
       var hay = (f.name + ' ' + f.desc + ' ' + (f.kw||'')).toLowerCase();
       return hay.indexOf(q) !== -1;
     });
@@ -2506,7 +2508,7 @@ function escapeHtml(s){return String(s||'').replace(/[&<>"']/g,c=>({'&':'&amp;',
       wrap.className = 'pc-actions';
       wrap.innerHTML =
         "<button type='button' class='pc-act wish'   aria-label='Wishlist'      title='Add to Wishlist'>♡</button>" +
-        (isLiving
+        (isLiving && (typeof featureOn!=='function' || featureOn('FUTURE_PLANTS'))
           ? "<button type='button' class='pc-act future' aria-label='Future Plant'  title='Save for Future'>🌱</button>"
           : "");
       img.appendChild(wrap);
@@ -2848,6 +2850,7 @@ function escapeHtml(s){return String(s||'').replace(/[&<>"']/g,c=>({'&':'&amp;',
 
   // ── inject Home header pill (next to streak badge) ─────────
   function ensureHomePill(){
+    if (typeof featureOn==='function' && !featureOn('REWARDS')) return;
     if (document.getElementById('gp-pill-home')) return;
     var streak = document.querySelector('#screen-home .home-header [title="Garden Streak"]');
     if (!streak || !streak.parentNode) return;
