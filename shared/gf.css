@@ -657,3 +657,36 @@ body{top:0!important;position:static!important;}
   /* any grid inside .scroll-body should fit phone width */
   .scroll-body [style*="grid-template-columns"]{max-width:100%;}
 }
+
+/* ══════════════ UX POLISH LAYER — conversion pass ══════════════ */
+/* Category rail — fastest path to product intent */
+.cat-rail{display:flex;gap:8px;overflow-x:auto;padding:10px 14px 6px;scrollbar-width:none;}
+.cat-rail::-webkit-scrollbar{display:none;}
+.cat-chip{display:flex;align-items:center;gap:6px;padding:9px 14px;background:var(--white);border:1.5px solid var(--border);border-radius:999px;font:800 12px 'Nunito',sans-serif;color:var(--text);cursor:pointer;white-space:nowrap;transition:all .15s ease;box-shadow:var(--shadow-sm);}
+.cat-chip span{font-size:15px;line-height:1;}
+.cat-chip:active{transform:scale(.93);background:var(--green-pale);border-color:var(--green);}
+
+/* Trust strip — answers "why buy here" in 1 glance */
+.trust-strip{display:flex;justify-content:center;gap:16px;padding:10px 14px 0;font-size:10px;font-weight:800;color:var(--muted);letter-spacing:.2px;white-space:nowrap;}
+.trust-strip span{display:flex;align-items:center;gap:4px;}
+
+/* Social-proof line on product cards */
+.prod-proof{font-size:9px;font-weight:800;color:var(--muted);margin-top:3px;letter-spacing:.2px;}
+
+/* ADD button — clearer affordance than a tiny + */
+.add-btn{min-width:52px;height:28px;padding:0 13px;background:var(--green);border:none;border-radius:999px;font-size:11px;font-weight:900;color:#fff;cursor:pointer;letter-spacing:.4px;box-shadow:0 3px 8px rgba(46,125,50,.32);display:flex;align-items:center;justify-content:center;transition:transform .12s ease,box-shadow .12s ease;}
+.add-btn:active{transform:scale(.88);box-shadow:0 1px 3px rgba(46,125,50,.3);}
+@media(hover:hover){.product-card:hover{transform:translateY(-3px);box-shadow:var(--shadow-md);}}
+
+/* Free-delivery progress nudge (cart) */
+.fd-progress{margin:2px 0 10px;}
+.fd-msg{font-size:11px;font-weight:800;color:var(--text);margin-bottom:5px;}
+.fd-track{height:7px;background:var(--green-pale);border-radius:99px;overflow:hidden;}
+.fd-bar{height:100%;background:var(--grad-fresh);border-radius:99px;transition:width .45s ease;}
+
+/* Flash-deal live countdown */
+#deal-countdown{font-variant-numeric:tabular-nums;font-weight:900;}
+
+/* Screen transitions — subtle app-like feel */
+.screen.active{animation:fadeSlide .22s ease;}
+@keyframes fadeSlide{from{opacity:.35;transform:translateY(8px);}to{opacity:1;transform:none;}}

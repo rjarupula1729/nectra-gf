@@ -46,6 +46,7 @@
       <button data-feature="FUTURE_PLANTS" onclick="showScreen('future')" style="flex:1;padding:10px;background:var(--white);color:var(--green-deep);border:1.5px dashed var(--green-pale);border-radius:10px;font:800 11px 'Nunito',sans-serif;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px">🌱 Future <span id="cart-future-count" style="background:var(--green);color:#fff;border-radius:10px;padding:1px 7px;font-size:10px;font-weight:900">0</span></button>
     </div>
     <div class="delivery-note">🚚 Free delivery above ₹499 · 2–4 hrs · Hyderabad</div>
+    <div class="fd-progress"><div class="fd-msg" id="fd-msg"></div><div class="fd-track"><div class="fd-bar" id="fd-bar" style="width:0%"></div></div></div>
     <div class="cart-summary"><div class="summary-row"><span>Subtotal</span><span id="summary-sub">₹0</span></div><div class="summary-row"><span>Delivery</span><span id="summary-delivery">₹49</span></div><div class="summary-row total"><span>Total</span><span id="summary-total">₹0</span></div></div>
     <button class="action-btn" onclick="showScreen('upi');setupUPI()">💳 Proceed to Pay</button>
   </div></div>

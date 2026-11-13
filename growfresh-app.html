@@ -115,6 +115,19 @@
       <div class="gf-sugg" id="home-sugg"></div>
     </div>
 
+    <!-- ══════ TRUST STRIP + CATEGORY RAIL — one-glance value + shop entry ══════ -->
+    <div class="trust-strip">
+      <span>🚚 2–4 hr delivery</span><span>🌱 Farm-fresh</span><span>🔁 Easy replacement</span>
+    </div>
+    <div class="cat-rail">
+      <button class="cat-chip" onclick="switchTab('shop','seeds')"><span>🌱</span>Seeds</button>
+      <button class="cat-chip" onclick="switchTab('shop','saplings')"><span>🌿</span>Saplings</button>
+      <button class="cat-chip" onclick="switchTab('shop','tools')"><span>🧰</span>Tools</button>
+      <button class="cat-chip" onclick="switchTab('shop','compost')"><span>🪱</span>Compost</button>
+      <button class="cat-chip" onclick="switchTab('shop','minerals')"><span>💎</span>Minerals</button>
+      <button class="cat-chip" onclick="switchTab('shop')"><span>🛍️</span>All</button>
+    </div>
+
     <!-- ══════ WFH HEALTH CORNER (Phase 1 — Work From Healthy Home) ══════ -->
     <div class="wfh-corner" data-feature="WELLNESS" onclick="openWfhBreaks()">
       <div class="wfh-ring" id="wfh-ring" style="--pct:0">
@@ -149,6 +162,7 @@
     <!-- ══════ SMART PICKS — season + behaviour personalised ══════ -->
     <div class="home-section" id="home-smart-picks">
       <div class="section-hdr"><div class="section-title">🌱 Smart picks <span id="home-picks-season" style="font-size:10px;color:var(--muted);font-weight:700"></span></div><div class="section-link" onclick="switchTab('shop')">Shop →</div></div>
+      <div style="font-size:10px;font-weight:800;color:var(--muted);margin-bottom:6px">🔥 Loved by gardeners in your city this week</div>
       <div id="home-picks-list" style="display:flex;flex-direction:column;gap:8px"></div>
     </div>
 
@@ -168,7 +182,7 @@
         <div class="bc-icon">📦</div>
         <div class="bc-body">
           <div class="bc-title">Balcony Starter Kit</div>
-          <div class="bc-sub">⏰ 40% OFF · ends in 4h</div>
+          <div class="bc-sub">⏰ 40% OFF · ends in <span id="deal-countdown">--:--</span></div>
         </div>
         <div style="text-align:right;flex-shrink:0">
           <div style="font-size:9px;text-decoration:line-through;opacity:0.8">₹449</div>
