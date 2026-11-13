@@ -52,6 +52,23 @@ router.get('/stats', async (_req, res) => {
   }
 });
 
+// GET /api/admin/funnel — behavior funnel for the last 7 days.
+// Powers the "we track → personalize → convert" story on the dashboard.
+router.get('/funnel', async (_req, res) => {
+  try {
+    const byType = await db('activity_events')
+      .where('created_at', '>=', db.raw("now() - interval '7 days'"))
+      .select('event_type').count('id as n').groupBy('event_type');
+    const users = await db('activity_events').countDistinct('user_id as n').first();
+    res.json({
+      byType: Object.fromEntries(byType.map((r) => [r.event_type, Number(r.n)])),
+      uniqueUsers: Number(users?.n) || 0,
+    });
+  } catch (err) {
+    res.status(500).json({ msg: 'Server error', error: err.message });
+  }
+});
+
 // PUT /api/admin/orders/:id/status { status }
 // Status machine for the fulfillment team.
 const FLOW = {

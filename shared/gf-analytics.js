@@ -15,19 +15,17 @@
     try { localStorage.setItem(KEY, JSON.stringify(evts.slice(-MAX))); } catch (e) {}
   }
 
-  /* Optional server sync — no-op when no backend (e.g. GitHub Pages). */
+  /* Optional server sync — POSTs to the real /api/activity endpoint with the
+     user's JWT. No-op when there's no backend or the user isn't logged in. */
   function push(evt) {
     try {
-      if (navigator.sendBeacon) {
-        navigator.sendBeacon('/api/events', JSON.stringify(evt));
-      } else {
-        fetch('/api/events', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(evt),
-          keepalive: true
-        }).catch(function () {});
-      }
+      if (typeof window.gfApi !== 'function' || !localStorage.getItem('gf_jwt')) return;
+      var payload = {};
+      for (var k in evt) { if (k !== 'e' && k !== 't') payload[k] = evt[k]; }
+      window.gfApi('/api/activity', {
+        method: 'POST',
+        body: { event_type: evt.e, screen: payload.screen || '', payload: payload, client: 'web' }
+      }).catch(function () {});
     } catch (e) {}
   }
 
