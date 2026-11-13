@@ -1,0 +1,1324 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GrowFresh - Fresh Starts at Home</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-green: #2d5016;
+            --light-green: #6fa83d;
+            --accent-orange: #ff8c42;
+            --bg-cream: #faf8f3;
+            --text-dark: #2c2c2c;
+            --card-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #faf8f3 0%, #e8f5e3 100%);
+            color: var(--text-dark);
+            line-height: 1.6;
+        }
+
+        /* Header Styles */
+        .header {
+            background: linear-gradient(135deg, var(--primary-green) 0%, var(--light-green) 100%);
+            color: white;
+            padding: 1.5rem 2rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .header-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            font-size: 1.8rem;
+            font-weight: bold;
+        }
+
+        .logo-icon {
+            font-size: 2rem;
+        }
+
+        .tagline {
+            font-size: 0.9rem;
+            opacity: 0.95;
+            font-style: italic;
+        }
+
+        .user-section {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+        }
+
+        .notification-bell {
+            position: relative;
+            cursor: pointer;
+            font-size: 1.5rem;
+        }
+
+        .notification-badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: var(--accent-orange);
+            color: white;
+            border-radius: 50%;
+            padding: 2px 6px;
+            font-size: 0.7rem;
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            cursor: pointer;
+            padding: 0.5rem 1rem;
+            border-radius: 25px;
+            background: rgba(255,255,255,0.1);
+            transition: background 0.3s;
+        }
+
+        .user-profile:hover {
+            background: rgba(255,255,255,0.2);
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+        }
+
+        /* Main Container */
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        /* Dashboard Header */
+        .dashboard-header {
+            background: white;
+            border-radius: 15px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: var(--card-shadow);
+        }
+
+        .welcome-message {
+            font-size: 1.8rem;
+            color: var(--primary-green);
+            margin-bottom: 0.5rem;
+        }
+
+        .personalized-tips {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        .tip-card {
+            background: linear-gradient(135deg, var(--light-green) 0%, var(--primary-green) 100%);
+            color: white;
+            padding: 1rem 1.5rem;
+            border-radius: 10px;
+            flex: 1;
+            min-width: 200px;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .tip-icon {
+            font-size: 2rem;
+        }
+
+        /* Navigation Modules */
+        .modules-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .module-card {
+            background: white;
+            border-radius: 15px;
+            padding: 2rem;
+            box-shadow: var(--card-shadow);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 3px solid transparent;
+        }
+
+        .module-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.12);
+            border-color: var(--light-green);
+        }
+
+        .module-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .module-icon {
+            font-size: 2.5rem;
+            width: 60px;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 12px;
+            background: linear-gradient(135deg, #e8f5e3 0%, #d4edda 100%);
+        }
+
+        .module-title {
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: var(--primary-green);
+        }
+
+        .module-features {
+            list-style: none;
+            margin-top: 1rem;
+        }
+
+        .module-features li {
+            padding: 0.4rem 0;
+            color: #666;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .module-features li:before {
+            content: "✓";
+            color: var(--light-green);
+            font-weight: bold;
+        }
+
+        /* AI Insights Section */
+        .ai-section {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 15px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: var(--card-shadow);
+        }
+
+        .ai-section h2 {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            font-size: 1.5rem;
+        }
+
+        .ai-insights-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+
+        .insight-card {
+            background: rgba(255,255,255,0.15);
+            padding: 1.5rem;
+            border-radius: 10px;
+            backdrop-filter: blur(10px);
+        }
+
+        .insight-card h3 {
+            font-size: 1.1rem;
+            margin-bottom: 0.5rem;
+        }
+
+        /* Ecosystem Section */
+        .ecosystem-section {
+            background: white;
+            border-radius: 15px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: var(--card-shadow);
+        }
+
+        .ecosystem-section h2 {
+            color: var(--primary-green);
+            margin-bottom: 1.5rem;
+            font-size: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .ecosystem-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .ecosystem-card {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            padding: 1.5rem;
+            border-radius: 12px;
+            border-left: 4px solid var(--light-green);
+            transition: transform 0.3s;
+        }
+
+        .ecosystem-card:hover {
+            transform: translateX(5px);
+        }
+
+        .ecosystem-card h3 {
+            color: var(--primary-green);
+            margin-bottom: 0.8rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .ecosystem-card ul {
+            list-style: none;
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .ecosystem-card ul li {
+            padding: 0.3rem 0;
+        }
+
+        /* Value Proposition Section */
+        .value-section {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .value-card {
+            background: white;
+            border-radius: 15px;
+            padding: 2rem;
+            text-align: center;
+            box-shadow: var(--card-shadow);
+            transition: all 0.3s;
+        }
+
+        .value-card:hover {
+            transform: scale(1.05);
+        }
+
+        .value-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .value-card h3 {
+            color: var(--primary-green);
+            margin-bottom: 0.8rem;
+        }
+
+        /* Revenue Model Section */
+        .revenue-section {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            border-radius: 15px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: var(--card-shadow);
+        }
+
+        .revenue-section h2 {
+            margin-bottom: 1.5rem;
+            font-size: 1.5rem;
+        }
+
+        .revenue-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+
+        .revenue-card {
+            background: rgba(255,255,255,0.2);
+            padding: 1.5rem;
+            border-radius: 10px;
+            backdrop-filter: blur(10px);
+        }
+
+        .revenue-card h3 {
+            font-size: 1.1rem;
+            margin-bottom: 0.5rem;
+        }
+
+        /* Impact Section */
+        .impact-section {
+            background: linear-gradient(135deg, var(--primary-green) 0%, var(--light-green) 100%);
+            color: white;
+            border-radius: 15px;
+            padding: 3rem;
+            text-align: center;
+            box-shadow: var(--card-shadow);
+        }
+
+        .impact-section h2 {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+        }
+
+        .impact-pillars {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin-top: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .impact-pillar {
+            font-size: 1.2rem;
+            font-weight: bold;
+            padding: 1rem 2rem;
+            background: rgba(255,255,255,0.2);
+            border-radius: 25px;
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.6);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 20px;
+            padding: 2rem;
+            max-width: 800px;
+            max-height: 90vh;
+            overflow-y: auto;
+            position: relative;
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            font-size: 2rem;
+            cursor: pointer;
+            color: #999;
+            background: none;
+            border: none;
+        }
+
+        .modal-close:hover {
+            color: var(--primary-green);
+        }
+
+        .modal-header {
+            color: var(--primary-green);
+            margin-bottom: 1.5rem;
+            font-size: 1.8rem;
+        }
+
+        .modal-section {
+            margin-bottom: 2rem;
+        }
+
+        .modal-section h3 {
+            color: var(--light-green);
+            margin-bottom: 1rem;
+        }
+
+        .feature-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+
+        .feature-item {
+            background: #f8f9fa;
+            padding: 1rem;
+            border-radius: 8px;
+            border-left: 3px solid var(--light-green);
+        }
+
+        /* Stats Dashboard */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 12px;
+            box-shadow: var(--card-shadow);
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: var(--light-green);
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        /* Buttons */
+        .btn {
+            padding: 0.8rem 2rem;
+            border-radius: 25px;
+            border: none;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--light-green) 0%, var(--primary-green) 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(111, 168, 61, 0.3);
+        }
+
+        .btn-secondary {
+            background: white;
+            color: var(--primary-green);
+            border: 2px solid var(--light-green);
+        }
+
+        .btn-secondary:hover {
+            background: var(--light-green);
+            color: white;
+        }
+
+        /* Progress Bar */
+        .progress-section {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            box-shadow: var(--card-shadow);
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 20px;
+            background: #e0e0e0;
+            border-radius: 10px;
+            overflow: hidden;
+            margin-top: 1rem;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--light-green) 0%, var(--primary-green) 100%);
+            transition: width 0.5s ease;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .container {
+                padding: 1rem;
+            }
+
+            .header-content {
+                flex-direction: column;
+                gap: 1rem;
+                text-align: center;
+            }
+
+            .modules-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .impact-pillars {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <div class="header">
+        <div class="header-content">
+            <div>
+                <div class="logo">
+                    <span class="logo-icon">🌱</span>
+                    <span>GrowFresh</span>
+                </div>
+                <div class="tagline">Healthy Soil • Healthy Food • Healthy You • Healthy India</div>
+            </div>
+            <div class="user-section">
+                <div class="notification-bell" onclick="showNotifications()">
+                    🔔
+                    <span class="notification-badge">3</span>
+                </div>
+                <div class="user-profile" onclick="showProfile()">
+                    <div class="user-avatar">👤</div>
+                    <span>Raj Kumar</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Container -->
+    <div class="container">
+        <!-- Dashboard Header -->
+        <div class="dashboard-header">
+            <h1 class="welcome-message">Welcome back, Raj! 🌿</h1>
+            <p>Your personalized dashboard is ready with AI-powered recommendations</p>
+            
+            <div class="personalized-tips">
+                <div class="tip-card">
+                    <span class="tip-icon">💧</span>
+                    <div>
+                        <strong>Water Alert</strong>
+                        <p style="font-size: 0.9rem; opacity: 0.9;">Time to water your tomato plants</p>
+                    </div>
+                </div>
+                <div class="tip-card">
+                    <span class="tip-icon">🌤️</span>
+                    <div>
+                        <strong>Perfect Weather</strong>
+                        <p style="font-size: 0.9rem; opacity: 0.9;">Great day for planting spinach!</p>
+                    </div>
+                </div>
+                <div class="tip-card">
+                    <span class="tip-icon">🎯</span>
+                    <div>
+                        <strong>Goal Progress</strong>
+                        <p style="font-size: 0.9rem; opacity: 0.9;">75% towards your health goals</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Stats Dashboard -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-value">12</div>
+                <div class="stat-label">Active Plants</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">8.5kg</div>
+                <div class="stat-label">Vegetables Grown</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">₹2,450</div>
+                <div class="stat-label">Money Saved</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">85%</div>
+                <div class="stat-label">Health Score</div>
+            </div>
+        </div>
+
+        <!-- Main Modules Grid -->
+        <h2 style="color: var(--primary-green); margin-bottom: 1.5rem; font-size: 1.8rem;">🏠 Your GrowFresh Modules</h2>
+        <div class="modules-grid">
+            <!-- My Garden Module -->
+            <div class="module-card" onclick="openModule('garden')">
+                <div class="module-header">
+                    <div class="module-icon">🌱</div>
+                    <div class="module-title">MY GARDEN</div>
+                </div>
+                <ul class="module-features">
+                    <li>Plant Recommendations</li>
+                    <li>Growing Guide (AI)</li>
+                    <li>Seasonal Calendar</li>
+                    <li>Soil Health Tips</li>
+                    <li>Pest Solutions (Natural)</li>
+                    <li>Garden Tracking</li>
+                </ul>
+            </div>
+
+            <!-- Learn & Grow Module -->
+            <div class="module-card" onclick="openModule('learn')">
+                <div class="module-header">
+                    <div class="module-icon">📚</div>
+                    <div class="module-title">LEARN & GROW</div>
+                </div>
+                <ul class="module-features">
+                    <li>Video Tutorials</li>
+                    <li>Courses</li>
+                    <li>Articles</li>
+                    <li>Traditional Wisdom</li>
+                    <li>Expert Sessions</li>
+                    <li>Kids Zone</li>
+                </ul>
+            </div>
+
+            <!-- Healthy Eating Module -->
+            <div class="module-card" onclick="openModule('eating')">
+                <div class="module-header">
+                    <div class="module-icon">🥗</div>
+                    <div class="module-title">HEALTHY EATING</div>
+                </div>
+                <ul class="module-features">
+                    <li>Nutrition Guidance (AI)</li>
+                    <li>Seasonal Food</li>
+                    <li>Recipes</li>
+                    <li>Food Combination</li>
+                    <li>Indian Superfoods</li>
+                    <li>Weekly Meal Planner</li>
+                </ul>
+            </div>
+
+            <!-- Community Module -->
+            <div class="module-card" onclick="openModule('community')">
+                <div class="module-header">
+                    <div class="module-icon">👥</div>
+                    <div class="module-title">COMMUNITY</div>
+                </div>
+                <ul class="module-features">
+                    <li>Community Feed</li>
+                    <li>Share Your Garden</li>
+                    <li>Q&A</li>
+                    <li>Challenges</li>
+                    <li>Events</li>
+                    <li>Local Groups</li>
+                </ul>
+            </div>
+
+            <!-- Shop Module -->
+            <div class="module-card" onclick="openModule('shop')">
+                <div class="module-header">
+                    <div class="module-icon">🛒</div>
+                    <div class="module-title">SHOP</div>
+                </div>
+                <ul class="module-features">
+                    <li>Seeds</li>
+                    <li>Grow Kits</li>
+                    <li>Organic Inputs</li>
+                    <li>Compost</li>
+                    <li>Plants</li>
+                    <li>GrowFresh Store</li>
+                </ul>
+            </div>
+
+            <!-- Wellness Tracker Module -->
+            <div class="module-card" onclick="openModule('wellness')">
+                <div class="module-header">
+                    <div class="module-icon">💚</div>
+                    <div class="module-title">WELLNESS TRACKER</div>
+                </div>
+                <ul class="module-features">
+                    <li>Daily Habits</li>
+                    <li>Home-grown %</li>
+                    <li>Food Diary</li>
+                    <li>Water Intake</li>
+                    <li>Activity (Gardening)</li>
+                    <li>Sleep & Stress</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- AI & Personalization Section -->
+        <div class="ai-section">
+            <h2>🤖 AI & Personalization Engine</h2>
+            <div class="ai-insights-grid">
+                <div class="insight-card">
+                    <h3>📊 Data Collection</h3>
+                    <p>Garden, Food, Habits, Preferences, Location, Season</p>
+                </div>
+                <div class="insight-card">
+                    <h3>🧠 AI Analysis</h3>
+                    <p>Understanding your patterns & goals</p>
+                </div>
+                <div class="insight-card">
+                    <h3>✅ Recommendations</h3>
+                    <p>What to grow, eat, improve</p>
+                </div>
+                <div class="insight-card">
+                    <h3>🔔 Smart Alerts</h3>
+                    <p>Water plants, Eat healthy, Try recipes, Season tips</p>
+                </div>
+                <div class="insight-card">
+                    <h3>📈 Progress Tracking</h3>
+                    <p>Your improvement, impact, savings, health trends</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Ecosystem Integrations -->
+        <div class="ecosystem-section">
+            <h2>🌐 Ecosystem Integrations</h2>
+            <div class="ecosystem-grid">
+                <div class="ecosystem-card">
+                    <h3>🏪 Community Marketplace</h3>
+                    <ul>
+                        <li>Buy / Sell / Exchange</li>
+                        <li>Plants, Seeds, Organic Produce</li>
+                        <li>Compost</li>
+                    </ul>
+                </div>
+                <div class="ecosystem-card">
+                    <h3>🤝 Local Partners</h3>
+                    <ul>
+                        <li>Nurseries</li>
+                        <li>Organic Farms</li>
+                        <li>Experts, Urban Gardens</li>
+                        <li>NGOs, Schools</li>
+                    </ul>
+                </div>
+                <div class="ecosystem-card">
+                    <h3>🏛️ Institutions</h3>
+                    <ul>
+                        <li>Schools, Apartments</li>
+                        <li>Corporate, Municipal Bodies</li>
+                        <li>CSR Programs</li>
+                    </ul>
+                </div>
+                <div class="ecosystem-card">
+                    <h3>🛡️ Health Insurance</h3>
+                    <ul>
+                        <li>Consistent Healthy Lifestyle Score</li>
+                        <li>→ Rewards / Discounts</li>
+                        <li>on Health Insurance</li>
+                    </ul>
+                </div>
+                <div class="ecosystem-card">
+                    <h3>🏛️ Government Initiatives</h3>
+                    <ul>
+                        <li>State Programs</li>
+                        <li>Urban Farming Missions</li>
+                        <li>Nutrition Programs</li>
+                        <li>Awareness Campaigns</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- User Journey Progress -->
+        <div class="progress-section">
+            <h3 style="color: var(--primary-green); margin-bottom: 1rem;">📊 Your Journey Progress</h3>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                <div>
+                    <p><strong>Gardening Skills</strong></p>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 65%"></div>
+                    </div>
+                </div>
+                <div>
+                    <p><strong>Healthy Eating Habits</strong></p>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 78%"></div>
+                    </div>
+                </div>
+                <div>
+                    <p><strong>Community Engagement</strong></p>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 45%"></div>
+                    </div>
+                </div>
+                <div>
+                    <p><strong>Sustainability Impact</strong></p>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 82%"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Value Proposition -->
+        <h2 style="color: var(--primary-green); margin-bottom: 1.5rem; font-size: 1.8rem;">🎁 Value For You</h2>
+        <div class="value-section">
+            <div class="value-card">
+                <div class="value-icon">🌱</div>
+                <h3>Grow Your Own</h3>
+                <p>Fresh & Healthy Food at Home</p>
+            </div>
+            <div class="value-card">
+                <div class="value-icon">❤️</div>
+                <h3>Improve Family Health</h3>
+                <p>Better Health & Immunity</p>
+            </div>
+            <div class="value-card">
+                <div class="value-icon">💰</div>
+                <h3>Save Money</h3>
+                <p>On Food & Healthcare</p>
+            </div>
+            <div class="value-card">
+                <div class="value-icon">🌍</div>
+                <h3>Improve Soil</h3>
+                <p>& Environment</p>
+            </div>
+            <div class="value-card">
+                <div class="value-icon">👥</div>
+                <h3>Be Part of</h3>
+                <p>Positive Community</p>
+            </div>
+            <div class="value-card">
+                <div class="value-icon">🏆</div>
+                <h3>Earn Rewards</h3>
+                <p>& Benefits</p>
+            </div>
+        </div>
+
+        <!-- Revenue Model -->
+        <div class="revenue-section">
+            <h2>💼 Revenue Model (Business Sustainability)</h2>
+            <div class="revenue-grid">
+                <div class="revenue-card">
+                    <h3>🛒 E-Commerce Sales</h3>
+                    <p>Seeds, Kits, Inputs, Plants, Subscription Boxes</p>
+                </div>
+                <div class="revenue-card">
+                    <h3>👑 Subscription Plans</h3>
+                    <p>Premium AI Guidance, Personalized Plans, Advanced Analytics</p>
+                </div>
+                <div class="revenue-card">
+                    <h3>🏪 Marketplace Commission</h3>
+                    <p>On Community Buying & Selling</p>
+                </div>
+                <div class="revenue-card">
+                    <h3>🏢 Institutional Partnerships</h3>
+                    <p>Schools, Apartments, Corporate Wellness Programs</p>
+                </div>
+                <div class="revenue-card">
+                    <h3>🛡️ Wellness & Insurance</h3>
+                    <p>Preventive Lifestyle → Rewards / Insurance Discounts (Long Term)</p>
+                </div>
+                <div class="revenue-card">
+                    <h3>📊 Data & Insights</h3>
+                    <p>Population Level Insights for Research, Government, Policy Partners</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Long Term Impact -->
+        <div class="impact-section">
+            <h2>🌟 Long Term Impact</h2>
+            <p style="font-size: 1.2rem; margin-bottom: 2rem;">A Preventive Health & Regenerative Living Movement Powered by Technology, Community & Conscious Choices</p>
+            <div class="impact-pillars">
+                <div class="impact-pillar">🧑‍🤝‍🧑 HEALTHIER PEOPLE</div>
+                <div class="impact-pillar">🌱 HEALTHIER SOIL</div>
+                <div class="impact-pillar">🇮🇳 STRONGER INDIA</div>
+                <div class="impact-pillar">🌍 BETTER FUTURE</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Module Modals -->
+    <div id="gardenModal" class="modal">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeModal('gardenModal')">&times;</button>
+            <h2 class="modal-header">🌱 My Garden</h2>
+            
+            <div class="modal-section">
+                <h3>Active Plants</h3>
+                <div class="feature-list">
+                    <div class="feature-item">
+                        <strong>🍅 Tomato</strong>
+                        <p style="font-size: 0.85rem; color: #666;">Day 42 • Flowering</p>
+                    </div>
+                    <div class="feature-item">
+                        <strong>🥬 Spinach</strong>
+                        <p style="font-size: 0.85rem; color: #666;">Day 28 • Growing</p>
+                    </div>
+                    <div class="feature-item">
+                        <strong>🌶️ Chili</strong>
+                        <p style="font-size: 0.85rem; color: #666;">Day 65 • Harvest Ready</p>
+                    </div>
+                    <div class="feature-item">
+                        <strong>🥒 Cucumber</strong>
+                        <p style="font-size: 0.85rem; color: #666;">Day 35 • Growing</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-section">
+                <h3>AI Recommendations</h3>
+                <div class="feature-item">
+                    <p>✓ Perfect time to plant coriander this week</p>
+                    <p>✓ Your tomatoes need support stakes now</p>
+                    <p>✓ Consider companion planting basil with tomatoes</p>
+                </div>
+            </div>
+
+            <div class="modal-section">
+                <h3>Seasonal Calendar</h3>
+                <p>Based on Hyderabad climate - May is perfect for:</p>
+                <div class="feature-list">
+                    <div class="feature-item">Okra (Bhindi)</div>
+                    <div class="feature-item">Bottle Gourd</div>
+                    <div class="feature-item">Ridge Gourd</div>
+                    <div class="feature-item">Amaranth</div>
+                </div>
+            </div>
+
+            <button class="btn btn-primary" style="margin-top: 1rem;">Track New Plant</button>
+        </div>
+    </div>
+
+    <div id="learnModal" class="modal">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeModal('learnModal')">&times;</button>
+            <h2 class="modal-header">📚 Learn & Grow</h2>
+            
+            <div class="modal-section">
+                <h3>Featured Courses</h3>
+                <div class="feature-list">
+                    <div class="feature-item">
+                        <strong>🎓 Beginner's Guide</strong>
+                        <p style="font-size: 0.85rem;">Urban Gardening Basics</p>
+                    </div>
+                    <div class="feature-item">
+                        <strong>🌿 Advanced</strong>
+                        <p style="font-size: 0.85rem;">Organic Pest Management</p>
+                    </div>
+                    <div class="feature-item">
+                        <strong>🥗 Nutrition</strong>
+                        <p style="font-size: 0.85rem;">Seasonal Indian Superfoods</p>
+                    </div>
+                    <div class="feature-item">
+                        <strong>🧒 Kids Zone</strong>
+                        <p style="font-size: 0.85rem;">Fun Gardening Activities</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-section">
+                <h3>Video Tutorials</h3>
+                <ul style="list-style: none;">
+                    <li>📹 How to prepare potting mix at home</li>
+                    <li>📹 Composting kitchen waste</li>
+                    <li>📹 Pruning techniques for healthy plants</li>
+                    <li>📹 Water management in summer</li>
+                </ul>
+            </div>
+
+            <div class="modal-section">
+                <h3>Traditional Wisdom</h3>
+                <p>Learn ancient Indian agricultural practices:</p>
+                <ul style="list-style: none;">
+                    <li>🌙 Planting by moon cycles</li>
+                    <li>🌾 Crop rotation methods</li>
+                    <li>🍃 Natural pest repellents</li>
+                    <li>💧 Water conservation techniques</li>
+                </ul>
+            </div>
+
+            <button class="btn btn-primary" style="margin-top: 1rem;">Browse All Courses</button>
+        </div>
+    </div>
+
+    <div id="eatingModal" class="modal">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeModal('eatingModal')">&times;</button>
+            <h2 class="modal-header">🥗 Healthy Eating</h2>
+            
+            <div class="modal-section">
+                <h3>AI Nutrition Guidance</h3>
+                <div class="feature-item" style="background: #e8f5e3; padding: 1.5rem;">
+                    <p><strong>Your Personalized Plan:</strong></p>
+                    <p>Based on your garden harvest and health goals:</p>
+                    <ul>
+                        <li>Increase leafy greens (spinach available!)</li>
+                        <li>Add more protein-rich lentils</li>
+                        <li>Use fresh herbs for flavor</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="modal-section">
+                <h3>This Week's Meal Plan</h3>
+                <div class="feature-list">
+                    <div class="feature-item">
+                        <strong>Monday</strong>
+                        <p style="font-size: 0.85rem;">Spinach Dal, Brown Rice</p>
+                    </div>
+                    <div class="feature-item">
+                        <strong>Tuesday</strong>
+                        <p style="font-size: 0.85rem;">Tomato Curry, Roti</p>
+                    </div>
+                    <div class="feature-item">
+                        <strong>Wednesday</strong>
+                        <p style="font-size: 0.85rem;">Mixed Veg, Quinoa</p>
+                    </div>
+                    <div class="feature-item">
+                        <strong>Thursday</strong>
+                        <p style="font-size: 0.85rem;">Chili Paneer, Millet</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-section">
+                <h3>Indian Superfoods</h3>
+                <div class="feature-list">
+                    <div class="feature-item">🌾 Millets</div>
+                    <div class="feature-item">🍃 Moringa</div>
+                    <div class="feature-item">🥜 Lentils</div>
+                    <div class="feature-item">🧄 Turmeric</div>
+                </div>
+            </div>
+
+            <button class="btn btn-primary" style="margin-top: 1rem;">Get Recipes</button>
+        </div>
+    </div>
+
+    <div id="communityModal" class="modal">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeModal('communityModal')">&times;</button>
+            <h2 class="modal-header">👥 Community</h2>
+            
+            <div class="modal-section">
+                <h3>Community Feed</h3>
+                <div class="feature-item" style="margin-bottom: 1rem;">
+                    <strong>Priya Sharma</strong> shared her balcony garden
+                    <p style="font-size: 0.85rem; color: #666;">2 hours ago • 24 likes</p>
+                </div>
+                <div class="feature-item" style="margin-bottom: 1rem;">
+                    <strong>Amit Patel</strong> asked about pest control
+                    <p style="font-size: 0.85rem; color: #666;">5 hours ago • 12 responses</p>
+                </div>
+                <div class="feature-item">
+                    <strong>Sunita Reddy</strong> shared a tomato recipe
+                    <p style="font-size: 0.85rem; color: #666;">1 day ago • 45 likes</p>
+                </div>
+            </div>
+
+            <div class="modal-section">
+                <h3>Upcoming Events</h3>
+                <div class="feature-list">
+                    <div class="feature-item">
+                        <strong>Weekend Workshop</strong>
+                        <p style="font-size: 0.85rem;">Composting 101 - May 15</p>
+                    </div>
+                    <div class="feature-item">
+                        <strong>Garden Tour</strong>
+                        <p style="font-size: 0.85rem;">Jubilee Hills - May 20</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-section">
+                <h3>Local Groups</h3>
+                <ul style="list-style: none;">
+                    <li>🌱 Hyderabad Urban Gardeners (234 members)</li>
+                    <li>🥕 Gachibowli Growing Circle (89 members)</li>
+                    <li>🌿 Banjara Hills Green Neighbors (156 members)</li>
+                </ul>
+            </div>
+
+            <button class="btn btn-primary" style="margin-top: 1rem;">Join Community</button>
+        </div>
+    </div>
+
+    <div id="shopModal" class="modal">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeModal('shopModal')">&times;</button>
+            <h2 class="modal-header">🛒 Shop</h2>
+            
+            <div class="modal-section">
+                <h3>Featured Products</h3>
+                <div class="feature-list">
+                    <div class="feature-item">
+                        <strong>🌱 Seed Starter Kit</strong>
+                        <p style="font-size: 0.85rem;">₹299 • 10 varieties</p>
+                    </div>
+                    <div class="feature-item">
+                        <strong>🪴 Grow Kit</strong>
+                        <p style="font-size: 0.85rem;">₹599 • Complete setup</p>
+                    </div>
+                    <div class="feature-item">
+                        <strong>🌿 Organic Mix</strong>
+                        <p style="font-size: 0.85rem;">₹199 • Potting soil</p>
+                    </div>
+                    <div class="feature-item">
+                        <strong>♻️ Compost Bin</strong>
+                        <p style="font-size: 0.85rem;">₹899 • Kitchen waste</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-section">
+                <h3>Seasonal Seeds</h3>
+                <p>Best for May planting in Hyderabad:</p>
+                <div class="feature-list">
+                    <div class="feature-item">Okra Seeds - ₹30</div>
+                    <div class="feature-item">Amaranth Seeds - ₹25</div>
+                    <div class="feature-item">Bottle Gourd - ₹35</div>
+                    <div class="feature-item">Spinach Seeds - ₹25</div>
+                </div>
+            </div>
+
+            <div class="modal-section">
+                <h3>GrowFresh Store (Subscription Boxes)</h3>
+                <div class="feature-item" style="background: #fff3cd;">
+                    <strong>Monthly Garden Box</strong>
+                    <p>₹499/month - Fresh seeds, organic inputs, expert tips</p>
+                    <button class="btn btn-secondary" style="margin-top: 0.5rem;">Subscribe</button>
+                </div>
+            </div>
+
+            <button class="btn btn-primary" style="margin-top: 1rem;">Browse Shop</button>
+        </div>
+    </div>
+
+    <div id="wellnessModal" class="modal">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeModal('wellnessModal')">&times;</button>
+            <h2 class="modal-header">💚 Wellness Tracker</h2>
+            
+            <div class="modal-section">
+                <h3>Your Health Score: 85%</h3>
+                <div class="progress-bar" style="height: 30px;">
+                    <div class="progress-fill" style="width: 85%"></div>
+                </div>
+            </div>
+
+            <div class="modal-section">
+                <h3>Today's Tracking</h3>
+                <div class="feature-list">
+                    <div class="feature-item">
+                        <strong>💧 Water Intake</strong>
+                        <p>6/8 glasses</p>
+                    </div>
+                    <div class="feature-item">
+                        <strong>🥗 Home-grown %</strong>
+                        <p>65% of meals</p>
+                    </div>
+                    <div class="feature-item">
+                        <strong>🏃 Activity</strong>
+                        <p>45 min gardening</p>
+                    </div>
+                    <div class="feature-item">
+                        <strong>😴 Sleep</strong>
+                        <p>7.5 hours</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-section">
+                <h3>Weekly Trends</h3>
+                <ul style="list-style: none;">
+                    <li>📈 Home-grown food increased by 15%</li>
+                    <li>📈 Water intake improved</li>
+                    <li>📈 Gardening activity up by 20 minutes</li>
+                    <li>💪 Overall wellness score +5 points</li>
+                </ul>
+            </div>
+
+            <div class="modal-section">
+                <h3>Insurance Benefits</h3>
+                <div class="feature-item" style="background: #d4edda;">
+                    <p><strong>Your healthy lifestyle qualifies for:</strong></p>
+                    <p>✓ 10% discount on health insurance premiums</p>
+                    <p>✓ Wellness rewards worth ₹2,000/year</p>
+                </div>
+            </div>
+
+            <button class="btn btn-primary" style="margin-top: 1rem;">View Full Report</button>
+        </div>
+    </div>
+
+    <script>
+        function openModule(moduleName) {
+            const modalId = moduleName + 'Modal';
+            const modal = document.getElementById(modalId);
+            if (modal) {
+                modal.classList.add('active');
+            }
+        }
+
+        function closeModal(modalId) {
+            const modal = document.getElementById(modalId);
+            if (modal) {
+                modal.classList.remove('active');
+            }
+        }
+
+        function showNotifications() {
+            alert('🔔 Notifications:\n\n' +
+                  '1. Time to water your tomato plants!\n' +
+                  '2. New recipe added: Fresh Spinach Dal\n' +
+                  '3. Community event: Weekend Workshop on May 15');
+        }
+
+        function showProfile() {
+            alert('👤 Profile Settings\n\n' +
+                  'Name: Raj Kumar\n' +
+                  'Location: Hyderabad\n' +
+                  'Member since: Jan 2026\n' +
+                  'Health Score: 85%\n' +
+                  'Plants Grown: 12\n' +
+                  'Community Level: Active Member');
+        }
+
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            if (event.target.classList.contains('modal')) {
+                event.target.classList.remove('active');
+            }
+        }
+
+        // Add some animation on page load
+        window.addEventListener('load', function() {
+            const cards = document.querySelectorAll('.module-card, .stat-card, .value-card');
+            cards.forEach((card, index) => {
+                setTimeout(() => {
+                    card.style.opacity = '0';
+                    card.style.transform = 'translateY(20px)';
+                    card.style.transition = 'all 0.5s ease';
+                    setTimeout(() => {
+                        card.style.opacity = '1';
+                        card.style.transform = 'translateY(0)';
+                    }, 50);
+                }, index * 50);
+            });
+        });
+    </script>
+</body>
+</html>
