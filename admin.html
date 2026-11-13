@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>GrowFresh — Ops Dashboard</title>
+<script src="shared/gf-config.js"></script>
+<style>
+  :root{--green:#2e7d32;--bg:#f4f6f4;--card:#fff;--ink:#1a2e1a;--mut:#6b7a6b;--red:#c62828;--amber:#ef6c00;--blue:#1565c0;}
+  *{box-sizing:border-box;margin:0;font-family:'Segoe UI',system-ui,sans-serif}
+  body{background:var(--bg);color:var(--ink);padding:18px}
+  header{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between;margin-bottom:14px}
+  h1{font-size:20px;color:var(--green)}
+  .stats{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px}
+  .stat{background:var(--card);border-radius:10px;padding:10px 16px;font-size:13px;color:var(--mut);box-shadow:0 1px 4px #0001}
+  .stat b{display:block;font-size:20px;color:var(--ink)}
+  .order{background:var(--card);border-radius:12px;padding:14px 16px;margin-bottom:12px;box-shadow:0 1px 4px #0001;border-left:5px solid var(--mut)}
+  .order.new{border-left-color:var(--green);animation:pulse 1.2s ease-in-out 3}
+  @keyframes pulse{50%{background:#e8f5e9}}
+  .ohead{display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:space-between;margin-bottom:6px}
+  .oid{font-weight:700;font-size:14px}
+  .badge{font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px;color:#fff}
+  .b-Confirmed{background:var(--blue)}.b-Packed{background:var(--amber)}
+  .b-Shipped,.b-Out-for-Delivery{background:#7b1fa2}
+  .b-Delivered{background:var(--green)}.b-Cancelled{background:var(--red)}
+  .meta{font-size:12px;color:var(--mut);margin-bottom:6px}
+  .items{font-size:13px;margin:6px 0}
+  .items li{margin-left:18px}
+  .addr{font-size:12px;color:var(--mut)}
+  .actions{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
+  .btn{border:none;border-radius:8px;padding:7px 14px;font-size:12px;font-weight:600;cursor:pointer;color:#fff;background:var(--green)}
+  .btn.warn{background:var(--red)}.btn.ghost{background:#546e7a}
+  .btn:disabled{opacity:.4;cursor:default}
+  .pay{font-size:12px;font-weight:600}
+  .paid{color:var(--green)}.unpaid{color:var(--red)}
+  #tokenbar{display:flex;gap:8px;align-items:center;font-size:13px}
+  #tokenbar input{padding:6px 10px;border:1px solid #ccc;border-radius:8px;width:220px}
+  #err{color:var(--red);font-size:13px;margin-bottom:10px}
+  .empty{color:var(--mut);text-align:center;padding:40px 0}
+  .dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--green);margin-right:6px;animation:blink 2s infinite}
+  @keyframes blink{50%{opacity:.2}}
+</style>
+</head>
+<body>
+<header>
+  <h1>🌱 GrowFresh Ops — Orders <span id="live"><span class="dot"></span>live</span></h1>
+  <div id="tokenbar">
+    <input id="tok" type="password" placeholder="ADMIN_TOKEN" autocomplete="off"/>
+    <button class="btn ghost" onclick="saveTok()">Connect</button>
+    <span id="conn" class="meta"></span>
+  </div>
+</header>
+<div class="stats" id="stats"></div>
+<div id="err"></div>
+<div id="list"><div class="empty">Enter your ADMIN_TOKEN to see the order queue.</div></div>
+
+<script>
+const NEXT = { 'Confirmed':['Packed','Cancelled'], 'Packed':['Out for Delivery','Cancelled'], 'Out for Delivery':['Delivered'], 'Shipped':['Delivered'], 'Delivered':[], 'Cancelled':[] };
+let seen = new Set(), firstPoll = true;
+
+const tok = () => sessionStorage.getItem('gf_admin_tok') || document.getElementById('tok').value.trim();
+function saveTok(){ sessionStorage.setItem('gf_admin_tok', document.getElementById('tok').value.trim()); firstPoll = true; seen.clear(); load(); }
+document.getElementById('tok').value = sessionStorage.getItem('gf_admin_tok') || '';
+document.getElementById('tok').addEventListener('keydown', e => { if (e.key==='Enter') saveTok(); });
+
+async function api(path, opts={}){
+  const res = await fetch(window.gfApiBase() + path, {
+    method: opts.method || 'GET',
+    headers: { 'Content-Type':'application/json', 'x-admin-token': tok() },
+    body: opts.body ? JSON.stringify(opts.body) : undefined,
+  });
+  const json = await res.json().catch(()=>({}));
+  if (!res.ok) throw new Error(json.msg || 'HTTP '+res.status);
+  return json;
+}
+
+function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+
+async function load(){
+  if (!tok()) return;
+  try {
+    const [orders, stats] = await Promise.all([api('/api/admin/orders'), api('/api/admin/stats')]);
+    document.getElementById('err').textContent = '';
+    document.getElementById('conn').textContent = 'API: ' + window.gfApiBase();
+    document.getElementById('stats').innerHTML =
+      `<div class="stat"><b>${stats.openOrders}</b>open orders</div>` +
+      `<div class="stat"><b>${stats.todayCount}</b>orders today</div>` +
+      `<div class="stat"><b>₹${stats.todayRevenue}</b>revenue today</div>` +
+      `<div class="stat"><b>${orders.length}</b>total shown</div>`;
+
+    const fresh = orders.filter(o => !seen.has(o.id));
+    if (firstPoll) fresh.length = 0; // don't flash the whole backlog on first load
+    firstPoll = false;
+
+    document.getElementById('list').innerHTML = orders.length ? orders.map(o => {
+      const isNew = fresh.some(f => f.id === o.id);
+      const addr = o.address || {};
+      const btns = (NEXT[o.status]||[]).map(s =>
+        `<button class="btn ${s==='Cancelled'?'warn':''}" onclick="setStatus('${o.id}','${s}')">${s}</button>`).join('');
+      return `<div class="order ${isNew?'new':''}">
+        <div class="ohead">
+          <span class="oid">#${esc(String(o.id).slice(0,8))} · ₹${Number(o.total).toFixed(0)}</span>
+          <span class="badge b-${esc(o.status).replace(/ /g,'-')}">${esc(o.status)}</span>
+        </div>
+        <div class="meta">🕐 ${new Date(o.placed_at).toLocaleString('en-IN')} · 👤 ${esc(o.customer_name||'Customer')} · 📞 ${esc(o.customer_mobile||'—')}
+          · <span class="pay ${o.payment_status==='Paid'?'paid':'unpaid'}">${esc(o.payment_method)} · ${esc(o.payment_status)}</span></div>
+        <ul class="items">${(o.items||[]).map(i=>`<li>${esc(i.name_snapshot)} ×${i.quantity} — ₹${Number(i.line_total).toFixed(0)}</li>`).join('')}</ul>
+        <div class="addr">📍 ${esc(addr.line1||'')}${addr.line2?', '+esc(addr.line2):''}, ${esc(addr.city||'')} ${esc(addr.pincode||'')}</div>
+        <div class="actions">${btns || '<span class="meta">— closed —</span>'}</div>
+      </div>`;
+    }).join('') : '<div class="empty">No orders yet.</div>';
+
+    orders.forEach(o => seen.add(o.id));
+    if (fresh.length) {
+      document.title = `(${fresh.length} NEW) GrowFresh Ops`;
+      try { new Audio('data:audio/wav;base64,UklGRl9vT19XQVZFZm10IBAAAAABAAEAQB8AAIA+AAACABAAZGF0YQAAAAA=').play().catch(()=>{}); } catch(e){}
+      setTimeout(()=> document.title = 'GrowFresh — Ops Dashboard', 8000);
+    }
+  } catch(e){
+    document.getElementById('err').textContent = e.status===401 || /token/i.test(e.message)
+      ? 'Invalid admin token.' : 'Cannot reach API: ' + e.message;
+  }
+}
+
+async function setStatus(id, status){
+  try { await api(`/api/admin/orders/${id}/status`, { method:'PUT', body:{ status } }); load(); }
+  catch(e){ alert('Update failed: ' + e.message); }
+}
+
+load();
+setInterval(load, 15000); // poll every 15s — ops team sees new orders live
+</script>
+</body>
+</html>

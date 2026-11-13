@@ -174,12 +174,16 @@ window.gfFirstName=function(){ var n=window.gfUserName(); return String(n).split
 // LOGIN
 let otpTimer=null;
 function switchLoginTab(tab,btn){document.querySelectorAll('.login-tab').forEach(b=>b.classList.remove('active'));btn.classList.add('active');document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));document.getElementById('panel-'+tab).classList.add('active');}
-function sendOtp(){const m=document.getElementById('mobile-input').value.trim();const e=document.getElementById('error-mobile');if(m.length!==10){e.classList.add('show');return;}e.classList.remove('show');setEl('otp-sent-to',m);document.getElementById('otp-section').classList.add('show');document.getElementById('send-otp-btn').textContent='✅ OTP Sent';document.getElementById('otp1').focus();startResendTimer();}
+function sendOtp(){const m=document.getElementById('mobile-input').value.trim();const e=document.getElementById('error-mobile');if(m.length!==10){e.classList.add('show');return;}e.classList.remove('show');setEl('otp-sent-to',m);document.getElementById('otp-section').classList.add('show');document.getElementById('send-otp-btn').textContent='✅ OTP Sent';document.getElementById('otp1').focus();startResendTimer();try{if(typeof gfApi==='function')gfApi('/api/auth/send-otp',{method:'POST',auth:false,body:{mobile:m}}).then(j=>{const h=document.getElementById('demo-otp-hint');if(h)h.textContent=j&&j.devOtp?('Dev OTP: '+j.devOtp):(j&&j.sent?'OTP sent via SMS ✓':'Demo OTP: 1 2 3 4');}).catch(()=>{});}catch(x){}}
 function startResendTimer(){let s=30;const tEl=document.getElementById('resend-timer'),rBtn=document.getElementById('resend-btn');tEl.style.display='inline';rBtn.style.display='none';clearInterval(otpTimer);otpTimer=setInterval(()=>{s--;tEl.textContent='Resend in '+s+'s';if(s<=0){clearInterval(otpTimer);tEl.style.display='none';rBtn.style.display='inline';}},1000);}
 function resendOtp(){['otp1','otp2','otp3','otp4'].forEach(id=>document.getElementById(id).value='');document.getElementById('error-otp').classList.remove('show');startResendTimer();document.getElementById('otp1').focus();}
 function otpMove(el,nextId){el.value=el.value.replace(/\D/g,'');if(el.value&&nextId)document.getElementById(nextId).focus();const all=['otp1','otp2','otp3','otp4'].map(id=>document.getElementById(id).value);if(all.every(v=>v))verifyOtp();}
 function otpBack(e,prevId){if(e.key==='Backspace'&&!e.target.value)document.getElementById(prevId).focus();}
-function verifyOtp(){const entered=['otp1','otp2','otp3','otp4'].map(id=>document.getElementById(id).value).join('');if(entered!=='1234'){document.getElementById('error-otp').classList.add('show');['otp1','otp2','otp3','otp4'].forEach(id=>{const el=document.getElementById(id);el.style.borderColor='var(--red)';setTimeout(()=>el.style.borderColor='',1500);});return;}document.getElementById('error-otp').classList.remove('show');const mobile=document.getElementById('mobile-input').value.trim();const name='User '+mobile.slice(-4);const sess={name,phone:mobile,email:'',method:'mobile',loginTime:Date.now()};sv(SK,sess);applySession(sess);try{ if(typeof gfTrack==='function') gfTrack('login',{method:'mobile'}); }catch(e){}loginSuccess();}
+async function verifyOtp(){const entered=['otp1','otp2','otp3','otp4'].map(id=>document.getElementById(id).value).join('');const mobile=document.getElementById('mobile-input').value.trim();const fail=()=>{document.getElementById('error-otp').classList.add('show');['otp1','otp2','otp3','otp4'].forEach(id=>{const el=document.getElementById(id);el.style.borderColor='var(--red)';setTimeout(()=>el.style.borderColor='',1500);});};let ok=entered==='1234';
+// live mode: verify against the backend-issued OTP first (stores JWT on success)
+if(!ok&&typeof gfApi==='function'){try{const j=await gfApi('/api/auth/verify-otp',{method:'POST',auth:false,body:{mobile,otp:entered}});if(j&&j.token){localStorage.setItem('gf_jwt',j.token);ok=true;}}catch(e){if(e.status){fail();return;}}}
+if(!ok){fail();return;}
+document.getElementById('error-otp').classList.remove('show');const name='User '+mobile.slice(-4);const sess={name,phone:mobile,email:'',method:'mobile',loginTime:Date.now()};sv(SK,sess);applySession(sess);try{ if(typeof gfTrack==='function') gfTrack('login',{method:'mobile'}); }catch(e){}loginSuccess();}
 function googleLogin(){const name=document.getElementById('google-name').value.trim();const email=document.getElementById('google-email').value.trim();if(!name||!email.includes('@')){document.getElementById('error-google').classList.add('show');return;}document.getElementById('error-google').classList.remove('show');const sess={name,phone:'',email,method:'google',loginTime:Date.now()};sv(SK,sess);applySession(sess);loginSuccess();}
 function loginSuccess(){clearInterval(otpTimer);goHome();}
 function logoutUser(){if(!confirm('Logout from GrowFresh?'))return;cl(SK);document.getElementById('mobile-input').value='';['otp1','otp2','otp3','otp4'].forEach(id=>document.getElementById(id).value='');document.getElementById('otp-section').classList.remove('show');document.getElementById('send-otp-btn').textContent='Send OTP →';document.getElementById('google-name').value='';document.getElementById('google-email').value='';Object.keys(cart).forEach(k=>{delete cart[k];renderCtrl(k);});updateCartUI();showScreen('splash');}
@@ -248,7 +252,57 @@ var selectedUpiApp=null;
 function setupUPI(){const items=Object.values(cart);const sub=items.reduce((s,i)=>s+i.price*i.qty,0);const del=sub>=499?0:49;const tot=sub+del;const qty=items.reduce((s,i)=>s+i.qty,0);setEl('upi-amount','₹'+tot);setEl('upi-items-info',qty+' item'+(qty>1?'s':'')+(del>0?' + ₹'+del+' delivery':' · Free delivery 🎉'));setEl('pay-btn-amount','₹'+tot);window._payTotal=tot;}
 function selectUpiApp(el,app){document.querySelectorAll('.upi-app-btn').forEach(b=>b.classList.remove('selected'));el.classList.add('selected');selectedUpiApp=app;document.getElementById('upi-id-input').value='';setEl('upi-verify-msg','');}
 function verifyUpi(){const val=document.getElementById('upi-id-input').value.trim();const msg=document.getElementById('upi-verify-msg');if(!val.includes('@')){msg.textContent='⚠️ Enter valid UPI ID';msg.style.color='var(--orange)';}else{msg.textContent='✅ Verified!';msg.style.color='var(--green)';selectedUpiApp='manual';document.querySelectorAll('.upi-app-btn').forEach(b=>b.classList.remove('selected'));}}
-function confirmPayment(){if(!selectedUpiApp){const v=document.getElementById('upi-id-input').value.trim();if(!v.includes('@')){alert('Select a UPI app or enter UPI ID.');return;}}const btn=document.getElementById('pay-now-btn');btn.innerHTML='⏳ Processing payment...';btn.disabled=true;setTimeout(()=>{const orderId='#GF'+String(Math.floor(10000+Math.random()*90000));const mins=45+Math.floor(Math.random()*75);const eta=new Date(Date.now()+mins*60000);const h=eta.getHours(),m=String(eta.getMinutes()).padStart(2,'0');const etaStr=(h>12?h-12:h||12)+':'+m+(h>=12?' PM':' AM')+' (~'+mins+' mins)';setEl('order-id',orderId);setEl('order-paid','₹'+window._payTotal);setEl('order-eta',etaStr);try{ if(typeof gfTrack==='function') gfTrack('order_placed',{orderId:orderId,total:window._payTotal,items:Object.keys(cart).length,method:selectedUpiApp?'Online':'COD'}); }catch(e){}Object.keys(cart).forEach(k=>{delete cart[k];renderCtrl(k);});updateCartUI();document.querySelectorAll('.upi-app-btn').forEach(b=>b.classList.remove('selected'));document.getElementById('upi-id-input').value='';setEl('upi-verify-msg','');selectedUpiApp=null;btn.innerHTML='✅ Pay <span id="pay-btn-amount">₹'+window._payTotal+'</span> Now';btn.disabled=false;showScreen('success');setTimeout(()=>{goHome();showToast('🌱 Order confirmed! Happy growing!');},3000);},1800);}
+// confirmPayment → dispatcher:
+//   1. Razorpay Checkout when the backend advertises it (payments:'razorpay')
+//   2. UPI deep link when GF_UPI_VPA is configured (opens PhonePe/GPay on the
+//      customer's phone, prefilled) — no gateway, no fees, real money
+//   3. otherwise the existing mock UPI animation (demo mode)
+async function confirmPayment(){if(!window._payConfig){try{window._payConfig=await gfApi('/api/config',{auth:false});}catch(e){window._payConfig={payments:'mock'};}}
+if(window._payConfig.payments==='razorpay'){payViaRazorpay();return;}
+if(window.GF_UPI_VPA){payViaUpiApp();return;}
+if(!selectedUpiApp){const v=document.getElementById('upi-id-input').value.trim();if(!v.includes('@')){alert('Select a UPI app or enter UPI ID.');return;}}const btn=document.getElementById('pay-now-btn');btn.innerHTML='⏳ Processing payment...';btn.disabled=true;setTimeout(finishPaymentSuccess,1800);}
+
+// UPI deep-link flow: first tap opens the customer's UPI app with amount +
+// order note prefilled; when they return, second tap places the order
+// (payment_status 'Pending' — ops verifies the credit before packing).
+function payViaUpiApp(){const btn=document.getElementById('pay-now-btn');
+if(window._upiPending){window._upiPending=false;window._upiJustPushed=true;if(typeof window.gfPushOrder==='function')window.gfPushOrder();finishPaymentSuccess();return;}
+const ref='GF'+String(Date.now()).slice(-8);
+window._upiRef=ref;
+const link='upi://pay?pa='+encodeURIComponent(window.GF_UPI_VPA)+'&pn='+encodeURIComponent(window.GF_UPI_NAME||'GrowFresh')+'&am='+window._payTotal+'&cu=INR&tn='+encodeURIComponent('Order '+ref);
+const isMobile=/Mobi|Android|iPhone|iPad/i.test(navigator.userAgent);
+if(isMobile){window.location.href=link;}else{alert('Scan not available — open this page on your phone and tap Pay to launch your UPI app.\n\nPay ₹'+window._payTotal+' to '+window.GF_UPI_VPA+'\nNote: Order '+ref);}
+window._upiPending=true;
+btn.innerHTML='✅ I\'ve completed the payment — Confirm order';
+setTimeout(()=>{if(window._upiPending){window._upiPending=false;btn.innerHTML='✅ Pay <span id="pay-btn-amount">₹'+window._payTotal+'</span> Now';}},120000);}
+
+function finishPaymentSuccess(){const btn=document.getElementById('pay-now-btn');if(!btn.disabled)btn.disabled=true;const orderId='#GF'+String(Math.floor(10000+Math.random()*90000));const mins=45+Math.floor(Math.random()*75);const eta=new Date(Date.now()+mins*60000);const h=eta.getHours(),m=String(eta.getMinutes()).padStart(2,'0');const etaStr=(h>12?h-12:h||12)+':'+m+(h>=12?' PM':' AM')+' (~'+mins+' mins)';setEl('order-id',orderId);setEl('order-paid','₹'+window._payTotal);setEl('order-eta',etaStr);try{ if(typeof gfTrack==='function') gfTrack('order_placed',{orderId:orderId,total:window._payTotal,items:Object.keys(cart).length,method:selectedUpiApp?'Online':'COD'}); }catch(e){}Object.keys(cart).forEach(k=>{delete cart[k];renderCtrl(k);});updateCartUI();document.querySelectorAll('.upi-app-btn').forEach(b=>b.classList.remove('selected'));const upiIn=document.getElementById('upi-id-input');if(upiIn)upiIn.value='';setEl('upi-verify-msg','');selectedUpiApp=null;btn.innerHTML='✅ Pay <span id="pay-btn-amount">₹'+window._payTotal+'</span> Now';btn.disabled=false;showScreen('success');setTimeout(()=>{goHome();showToast('🌱 Order confirmed! Happy growing!');},3000);}
+
+function loadRzp(){return new Promise((res,rej)=>{if(window.Razorpay)return res();const s=document.createElement('script');s.src='https://checkout.razorpay.com/v1/checkout.js';s.onload=res;s.onerror=()=>rej(new Error('Could not load Razorpay'));document.head.appendChild(s);});}
+
+async function payViaRazorpay(){const btn=document.getElementById('pay-now-btn');btn.innerHTML='⏳ Opening secure payment...';btn.disabled=true;window._rzpActive=true;
+const reset=()=>{window._rzpActive=false;btn.innerHTML='✅ Pay <span id="pay-btn-amount">₹'+window._payTotal+'</span> Now';btn.disabled=false;};
+try{
+  await loadRzp();
+  const ord=await gfApi('/api/payments/razorpay/order',{method:'POST',body:{amount:window._payTotal}});
+  const sess=JSON.parse(localStorage.getItem('gf_s5_sess')||'{}');
+  const rzp=new Razorpay({
+    key:window._payConfig.razorpayKeyId,amount:ord.amount,currency:ord.currency,order_id:ord.orderId,
+    name:'GrowFresh',description:'Garden essentials order',
+    prefill:{contact:sess.phone||''},
+    modal:{ondismiss:reset},
+    handler:async(resp)=>{
+      try{
+        const v=await gfApi('/api/payments/razorpay/verify',{method:'POST',body:resp});
+        window._paymentRef=v.paymentId;window._rzpActive=false;
+        if(typeof window.gfPushOrder==='function')window.gfPushOrder();
+        finishPaymentSuccess();
+      }catch(e){reset();alert('Payment verification failed — no order was placed.');}
+    },
+  });
+  rzp.on('payment.failed',()=>{reset();alert('Payment failed — try again or choose another method.');});
+  rzp.open();
+}catch(e){reset();alert('Payment could not start: '+(e.message||e));}}
 
 // GARDEN
 var myPlants=[];
@@ -1984,7 +2038,9 @@ function escapeHtml(s){return String(s||'').replace(/[&<>"']/g,c=>({'&':'&amp;',
   //     mirror the order to the backend (orders + transactions tables).
   //     Runs IN PARALLEL with the existing fake-success animation so the UX
   //     stays exactly the same; the DB just gets the row.
-  wrap('confirmPayment', async function(){
+  // Push the cart as a real order. Called by the payment hook; during a
+  // Razorpay flow it is invoked manually only after signature verification.
+  window.gfPushOrder = async function(){
     if (!getToken()) { console.log('[gf-api] payment but no JWT – skipping order push'); return; }
     const cart = window.cart || {};
     const items = Object.values(cart);
@@ -1997,11 +2053,21 @@ function escapeHtml(s){return String(s||'').replace(/[&<>"']/g,c=>({'&':'&amp;',
         quantity:  c.qty,
       })).filter(i => i.productId);
       if (!apiItems.length) { console.warn('[gf-api] no matching products on server'); return; }
+      const paid = Boolean(window._paymentRef);
+      const prof = JSON.parse(localStorage.getItem('userProfile')||'{}');
       const order = await api('/api/orders', { method:'POST', body:{
         items: apiItems,
-        address: { line1:'Demo address', city:'Hyderabad', state:'TG', pincode:'500001' },
-        paymentMethod: window.selectedUpiApp ? 'Online' : 'COD',
+        address: {
+          line1: prof.house || 'Address on file',
+          line2: prof.area || '',
+          city:  prof.city || 'Hyderabad',
+          state: 'TG',
+          pincode: prof.pin || '500001',
+        },
+        paymentMethod: paid || window.selectedUpiApp ? 'Online' : 'COD',
+        ...(paid ? { paymentRef: window._paymentRef, gateway: 'razorpay' } : {}),
       }});
+      window._paymentRef = null;
       logEvent('order_placed', 'upi', {
         order_id: order.id || order._id,
         total: order.total,
@@ -2010,6 +2076,12 @@ function escapeHtml(s){return String(s||'').replace(/[&<>"']/g,c=>({'&':'&amp;',
       console.log('[gf-api] ✅ order persisted:', order.id || order._id);
       setStatus('order #'+String(order.id||'').slice(0,8)+' saved');
     } catch(e){ console.warn('[gf-api] order persist failed:', e.message); }
+  };
+  wrap('confirmPayment', function(){
+    if (window._rzpActive) return;      // Razorpay pushes the order after verify
+    if (window._upiPending) return;     // UPI deep link pushes on confirm tap
+    if (window._upiJustPushed) { window._upiJustPushed = false; return; }
+    window.gfPushOrder();
   });
 
   // 7️⃣  FAMILY MEMBERS — every add/remove writes to family_members table.

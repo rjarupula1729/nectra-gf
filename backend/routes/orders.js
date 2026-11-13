@@ -3,7 +3,9 @@
 // Awards reward points + updates stock atomically.
 const express = require('express');
 const auth = require('../middleware/auth');
+const admin = require('../middleware/admin');
 const db = require('../config/db');
+const { notifyNewOrder } = require('../utils/notify');
 const router = express.Router();
 
 const DELIVERY_CHARGE = 50;
@@ -54,7 +56,7 @@ router.get('/:id', auth, async (req, res) => {
 
 // POST /api/orders  body: { items:[{productId,quantity}], address, paymentMethod }
 router.post('/', auth, async (req, res) => {
-  const { items, address, paymentMethod = 'COD' } = req.body;
+  const { items, address, paymentMethod = 'COD', paymentRef, gateway } = req.body;
   if (!Array.isArray(items) || items.length === 0) {
     return res.status(400).json({ msg: 'Order must contain at least one item' });
   }
@@ -94,7 +96,9 @@ router.post('/', auth, async (req, res) => {
         total,
         status: 'Confirmed',
         payment_method: paymentMethod,
-        payment_status: paymentMethod === 'COD' ? 'Pending' : 'Paid',
+        // 'Paid' only when a verified gateway ref is supplied (e.g. Razorpay);
+        // COD and UPI deep-link orders stay 'Pending' until ops verifies.
+        payment_status: paymentRef ? 'Paid' : 'Pending',
         address,
         confirmed_at: trx.fn.now(),
       }).returning('*');
@@ -113,9 +117,9 @@ router.post('/', auth, async (req, res) => {
         order_id: order.id,
         amount: total,
         payment_method: paymentMethod,
-        status: paymentMethod === 'COD' ? 'pending' : 'success',
-        gateway: 'demo',
-        gateway_ref: `DEMO-${Date.now()}`,
+        status: paymentRef ? 'success' : 'pending',
+        gateway: gateway || 'demo',
+        gateway_ref: paymentRef || `DEMO-${Date.now()}`,
       });
 
       // 6. Award reward points (10 per order)
@@ -124,19 +128,24 @@ router.post('/', auth, async (req, res) => {
       return { ...order, _id: order.id, items: lineRows };
     });
 
+    // ping the ops team (webhook) — never blocks the response
+    const user = await db('users').where({ id: req.user.id }).first();
+    notifyNewOrder(result, result.items, user);
+
     res.json(result);
   } catch (err) {
     res.status(err.status || 500).json({ msg: err.message || 'Server error' });
   }
 });
 
-// PUT /api/orders/:id/status  (admin)
-router.put('/:id/status', async (req, res) => {
+// PUT /api/orders/:id/status  (admin — requires ADMIN_TOKEN)
+router.put('/:id/status', admin, async (req, res) => {
   try {
     const { status } = req.body;
-    if (!status) return res.status(400).json({ msg: 'Status is required' });
+    const ALLOWED = ['Confirmed', 'Packed', 'Shipped', 'Out for Delivery', 'Delivered', 'Cancelled'];
+    if (!ALLOWED.includes(status)) return res.status(400).json({ msg: 'Invalid status' });
     const patch = { status };
-    if (status === 'Shipped')   patch.shipped_at = db.fn.now();
+    if (status === 'Shipped' || status === 'Out for Delivery') patch.shipped_at = db.fn.now();
     if (status === 'Delivered') patch.delivered_at = db.fn.now();
     const [order] = await db('orders').where({ id: req.params.id }).update(patch).returning('*');
     if (!order) return res.status(404).json({ msg: 'Order not found' });

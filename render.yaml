@@ -20,6 +20,13 @@ services:
         value: 30d
       - key: CORS_ORIGIN
         value: "*"
+      # ── set these in the Render dashboard (secret values, not committed) ──
+      # - key: ADMIN_TOKEN            # protects /api/admin/* — openssl rand -hex 24
+      # - key: NOTIFY_WEBHOOK_URL     # Slack/Discord webhook → ops team order alerts
+      # - key: SMS_PROVIDER           # console | msg91 | fast2sms | twilio
+      # - key: MSG91_AUTH_KEY / MSG91_TEMPLATE_ID / FAST2SMS_API_KEY / TWILIO_*
+      # - key: DEMO_OTP               # leave unset in prod to disable the demo code
+      # - key: RAZORPAY_KEY_ID / RAZORPAY_KEY_SECRET   # enables real UPI checkout
       - key: DATABASE_URL
         fromDatabase:
           name: growfresh-db

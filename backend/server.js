@@ -36,9 +36,13 @@ app.use(
   })
 );
 
-// stricter limit for OTP endpoint
+// stricter limit for OTP endpoints
 app.use(
   '/api/auth/verify-otp',
+  rateLimit({ windowMs: 10 * 60 * 1000, max: 10 })
+);
+app.use(
+  '/api/auth/send-otp',
   rateLimit({ windowMs: 10 * 60 * 1000, max: 10 })
 );
 
@@ -54,10 +58,19 @@ app.use('/api/analytics',   require('./routes/analytics'));
 app.use('/api/activity',    require('./routes/activity'));
 app.use('/api/family',      require('./routes/family'));
 app.use('/api/wellness',    require('./routes/wellness'));
+app.use('/api/admin',       require('./routes/admin'));
+app.use('/api/payments',    require('./routes/payments'));
 
 // liveness + readiness
 app.get('/', (_req, res) => res.json({ name: 'growfresh-api', status: 'ok' }));
 app.get('/api/health', (_req, res) => res.json({ ok: true, ts: Date.now() }));
+
+// public client config — lets the frontend pick the right payment/OTP mode
+app.get('/api/config', (_req, res) => res.json({
+  payments: process.env.RAZORPAY_KEY_ID && process.env.RAZORPAY_KEY_SECRET ? 'razorpay' : 'mock',
+  razorpayKeyId: process.env.RAZORPAY_KEY_ID || null,
+  sms: (process.env.SMS_PROVIDER || 'console') !== 'console',
+}));
 
 // fallback 404
 app.use((req, res) => res.status(404).json({ msg: `Not found: ${req.method} ${req.path}` }));

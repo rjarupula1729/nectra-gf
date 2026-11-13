@@ -1,18 +1,65 @@
 // auth.js - Postgres edition
-// OTP login (demo OTP "1234") + profile + family CRUD + health profile.
+// OTP login + profile + family CRUD + health profile.
+// POST /send-otp issues a real OTP (SMS_PROVIDER); in non-production the
+// DEMO_OTP code (default "1234") also verifies so demo mode still works.
 const express = require('express');
 const jwt = require('jsonwebtoken');
+const crypto = require('crypto');
 const db = require('../config/db');
 const auth = require('../middleware/auth');
+const { sendOtpSms } = require('../utils/sms');
 
 const router = express.Router();
+const OTP_TTL_MS = 5 * 60 * 1000;
+const hashOtp = (mobile, otp) =>
+  crypto.createHash('sha256').update(`${mobile}:${otp}:${process.env.JWT_SECRET}`).digest('hex');
+
+// POST /api/auth/send-otp  { mobile }
+router.post('/send-otp', async (req, res) => {
+  try {
+    const { mobile } = req.body;
+    if (!mobile || !/^\d{10}$/.test(mobile)) {
+      return res.status(400).json({ msg: 'Valid 10-digit mobile is required' });
+    }
+    const otp = String(Math.floor(1000 + Math.random() * 9000));
+    await db('otps').where({ mobile }).del(); // one active OTP per mobile
+    await db('otps').insert({
+      mobile,
+      otp_hash: hashOtp(mobile, otp),
+      expires_at: new Date(Date.now() + OTP_TTL_MS),
+    });
+    const result = await sendOtpSms(mobile, otp);
+    // devOtp is only ever set by the "console" provider — never a real SMS one
+    res.json({ sent: true, provider: result.provider, ...(result.devOtp ? { devOtp: result.devOtp } : {}) });
+  } catch (err) {
+    res.status(500).json({ msg: 'Could not send OTP', error: err.message });
+  }
+});
 
 // POST /api/auth/verify-otp  { mobile, otp }
 router.post('/verify-otp', async (req, res) => {
   try {
     const { mobile, otp } = req.body;
     if (!mobile || !otp) return res.status(400).json({ msg: 'Mobile and OTP are required' });
-    if (otp !== '1234')   return res.status(400).json({ msg: 'Invalid OTP' });
+
+    // 1) stored OTP path (real send-otp flow)
+    const row = await db('otps').where({ mobile }).orderBy('created_at', 'desc').first();
+    let ok = false;
+    if (row) {
+      if (row.attempts >= 5) return res.status(429).json({ msg: 'Too many attempts — request a new OTP' });
+      ok = row.expires_at > new Date() && row.otp_hash === hashOtp(mobile, otp);
+      if (ok) {
+        await db('otps').where({ id: row.id }).del();
+      } else {
+        await db('otps').where({ id: row.id }).increment('attempts', 1);
+      }
+    }
+    // 2) demo fallback — disabled in production unless DEMO_OTP is explicitly set
+    if (!ok) {
+      const demoCode = process.env.DEMO_OTP || (process.env.NODE_ENV !== 'production' ? '1234' : null);
+      ok = demoCode && otp === demoCode;
+    }
+    if (!ok) return res.status(400).json({ msg: 'Invalid or expired OTP' });
 
     let user = await db('users').where({ mobile }).first();
     if (!user) {
