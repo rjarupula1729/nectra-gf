@@ -13,6 +13,7 @@ import {
 import { LinearGradient } from "expo-linear-gradient";
 import { Ionicons } from "@expo/vector-icons";
 import { AppContext } from "../context/AppContext";
+import { FEATURES } from "../config/features";
 import API from "../services/api";
 import { COLORS, GRADIENTS } from "../utils/colors";
 import { SPACING, RADIUS, SHADOWS, TYPE } from "../utils/theme";
@@ -131,9 +132,11 @@ export default function ProfileScreen({ navigation }) {
           <View style={{ flex: 1 }}>
             <Text style={styles.name}>{profile.name}</Text>
             <Text style={styles.phone}>+91 {profile.mobile || "—"}</Text>
-            <View style={{ marginTop: 6 }}>
-              <InfoChip label={`${user?.rewardPoints || 0} POINTS`} variant="sun" icon="⭐" />
-            </View>
+            {FEATURES.REWARDS && (
+              <View style={{ marginTop: 6 }}>
+                <InfoChip label={`${user?.rewardPoints || 0} POINTS`} variant="sun" icon="⭐" />
+              </View>
+            )}
           </View>
         </View>
       </LinearGradient>
@@ -172,56 +175,76 @@ export default function ProfileScreen({ navigation }) {
             sub="Plants you're growing"
             onPress={() => goToTab("Garden")}
           />
-          <Row
-            icon="💬"
-            title="Community"
-            sub="Posts · comments · likes"
-            onPress={() => goToTab("Community")}
-          />
-          <Row
-            icon="👨‍🏫"
-            title="Expert Consultants"
-            sub="Bookings · sessions"
-            onPress={() => navigation.navigate("InstructorBookingScreen")}
-          />
+          {FEATURES.COMMUNITY && (
+            <Row
+              icon="💬"
+              title="Community"
+              sub="Posts · comments · likes"
+              onPress={() => goToTab("Community")}
+            />
+          )}
+          {FEATURES.EXPERTS && (
+            <Row
+              icon="👨‍🏫"
+              title="Expert Consultants"
+              sub="Bookings · sessions"
+              onPress={() => navigation.navigate("InstructorBookingScreen")}
+            />
+          )}
           <Row
             icon="❤️"
             title="My Wishlist"
             sub={`${wishlist?.length || 0} saved ${(wishlist?.length || 0) === 1 ? "item" : "items"}`}
             onPress={() => navigation.navigate("WishlistScreen")}
           />
-          <Row
-            icon="🌱"
-            title="Future Plants"
-            sub={`${futurePlants?.length || 0} planned`}
-            onPress={() => navigation.navigate("FuturePlantsScreen")}
-          />
+          {FEATURES.FUTURE_PLANTS && (
+            <Row
+              icon="🌱"
+              title="Future Plants"
+              sub={`${futurePlants?.length || 0} planned`}
+              onPress={() => navigation.navigate("FuturePlantsScreen")}
+            />
+          )}
         </Card>
 
         {/* Wellness */}
-        <SectionLabel label="WELLNESS & REWARDS" />
-        <Card>
-          <Row
-            icon="💚"
-            title="Healthy Urban Living"
-            sub="Breathing · Breaks · 1-Hour for You"
-            onPress={() => navigation.navigate("UrbanLivingScreen")}
-          />
-          <Row icon="🥗" title="Healthy Eating" sub="Recipes · Meal planner" />
-          <Row
-            icon="🎁"
-            title="GrowPoints & Rewards"
-            sub={`${growPoints || 0} pts · Earn · Redeem`}
-            onPress={() => navigation.navigate("AchievementsScreen")}
-          />
-          <Row
-            icon="🌐"
-            title="Communities Hub"
-            sub={`${communities?.length || 0} joined · Discover groups`}
-            onPress={() => navigation.navigate("CommunitiesHubScreen")}
-          />
-          <Row icon="♻️" title="Soil Health" sub="Compost · Carbon impact" />
-        </Card>
+        {(FEATURES.WELLNESS || FEATURES.REWARDS || FEATURES.COMMUNITY) && (
+          <>
+            <SectionLabel label="WELLNESS & REWARDS" />
+            <Card>
+              {FEATURES.WELLNESS && (
+                <>
+                  <Row
+                    icon="💚"
+                    title="Healthy Urban Living"
+                    sub="Breathing · Breaks · 1-Hour for You"
+                    onPress={() => navigation.navigate("UrbanLivingScreen")}
+                  />
+                  <Row icon="🥗" title="Healthy Eating" sub="Recipes · Meal planner" />
+                </>
+              )}
+              {FEATURES.REWARDS && (
+                <Row
+                  icon="🎁"
+                  title="GrowPoints & Rewards"
+                  sub={`${growPoints || 0} pts · Earn · Redeem`}
+                  onPress={() => navigation.navigate("AchievementsScreen")}
+                />
+              )}
+              {FEATURES.COMMUNITY && (
+                <Row
+                  icon="🌐"
+                  title="Communities Hub"
+                  sub={`${communities?.length || 0} joined · Discover groups`}
+                  onPress={() => navigation.navigate("CommunitiesHubScreen")}
+                />
+              )}
+              {FEATURES.WELLNESS && (
+                <Row icon="♻️" title="Soil Health" sub="Compost · Carbon impact" />
+              )}
+            </Card>
+          </>
+        )}
 
         {/* Settings */}
         <SectionLabel label="SETTINGS" />

@@ -15,6 +15,7 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import { AppContext } from '../context/AppContext';
 import api from '../services/api';
+import { FEATURES } from '../config/features';
 import { COLORS } from '../utils/colors';
 import ScreenHeader from '../components/ScreenHeader';
 import EmptyState from '../components/EmptyState';
@@ -344,32 +345,36 @@ const PlantTrackingScreen = ({ navigation }) => {
               </View>
 
               {/* Instructor Support */}
-              <View style={styles.modalSection}>
-                <Text style={styles.sectionTitle}>Need Help?</Text>
-                <TouchableOpacity style={styles.instructorBox}>
-                  <Ionicons name="person-circle" size={24} color={COLORS.green} />
-                  <View style={{ flex: 1, marginLeft: 12 }}>
-                    <Text style={styles.instructorTitle}>Book Expert Consultation</Text>
-                    <Text style={styles.instructorText}>
-                      Get guidance from our expert gardeners
-                    </Text>
-                  </View>
-                  <Ionicons name="chevron-forward" size={20} color={COLORS.gray} />
-                </TouchableOpacity>
-              </View>
+              {FEATURES.EXPERTS && (
+                <View style={styles.modalSection}>
+                  <Text style={styles.sectionTitle}>Need Help?</Text>
+                  <TouchableOpacity style={styles.instructorBox}>
+                    <Ionicons name="person-circle" size={24} color={COLORS.green} />
+                    <View style={{ flex: 1, marginLeft: 12 }}>
+                      <Text style={styles.instructorTitle}>Book Expert Consultation</Text>
+                      <Text style={styles.instructorText}>
+                        Get guidance from our expert gardeners
+                      </Text>
+                    </View>
+                    <Ionicons name="chevron-forward" size={20} color={COLORS.gray} />
+                  </TouchableOpacity>
+                </View>
+              )}
 
               {/* Rewards Info */}
-              <View style={styles.modalSection}>
-                <View style={styles.rewardsBox}>
-                  <Ionicons name="star" size={24} color={COLORS.yellow} />
-                  <View style={{ marginLeft: 12, flex: 1 }}>
-                    <Text style={styles.rewardsTitle}>Reward Points</Text>
-                    <Text style={styles.rewardsText}>
-                      Started plant: +10 pts | Log update: +2 pts each
-                    </Text>
+              {FEATURES.REWARDS && (
+                <View style={styles.modalSection}>
+                  <View style={styles.rewardsBox}>
+                    <Ionicons name="star" size={24} color={COLORS.yellow} />
+                    <View style={{ marginLeft: 12, flex: 1 }}>
+                      <Text style={styles.rewardsTitle}>Reward Points</Text>
+                      <Text style={styles.rewardsText}>
+                        Started plant: +10 pts | Log update: +2 pts each
+                      </Text>
+                    </View>
                   </View>
                 </View>
-              </View>
+              )}
 
               {/* Action Buttons */}
               <View style={styles.actionButtons}>

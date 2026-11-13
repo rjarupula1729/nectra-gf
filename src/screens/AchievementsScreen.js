@@ -13,6 +13,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 
 import { AppContext } from "../context/AppContext";
+import { FEATURES } from "../config/features";
 import { COLORS, GRADIENTS } from "../utils/colors";
 import { RADIUS, SHADOWS, SPACING, TYPE } from "../utils/theme";
 
@@ -94,19 +95,23 @@ export default function AchievementsScreen({ navigation }) {
         </View>
 
         {/* Daily challenge */}
-        <Text style={styles.sectionTitle}>Today's Challenge</Text>
-        <TouchableOpacity
-          style={styles.challengeCard}
-          onPress={() => navigation.navigate("UrbanLivingScreen")}
-          activeOpacity={0.85}
-        >
-          <View style={styles.challengeBar}>
-            <View style={[styles.challengeFill, { width: dailyPct + "%" }]} />
-          </View>
-          <Text style={styles.challengeText}>
-            {dailyDone}/{dailyTotal} wellness actions ({dailyPct}%) - tap to continue
-          </Text>
-        </TouchableOpacity>
+        {FEATURES.WELLNESS && (
+          <>
+            <Text style={styles.sectionTitle}>Today's Challenge</Text>
+            <TouchableOpacity
+              style={styles.challengeCard}
+              onPress={() => navigation.navigate("UrbanLivingScreen")}
+              activeOpacity={0.85}
+            >
+              <View style={styles.challengeBar}>
+                <View style={[styles.challengeFill, { width: dailyPct + "%" }]} />
+              </View>
+              <Text style={styles.challengeText}>
+                {dailyDone}/{dailyTotal} wellness actions ({dailyPct}%) - tap to continue
+              </Text>
+            </TouchableOpacity>
+          </>
+        )}
 
         {/* Badges grid */}
         <Text style={styles.sectionTitle}>Badges</Text>

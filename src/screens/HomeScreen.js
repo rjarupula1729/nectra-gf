@@ -15,6 +15,7 @@ import { LinearGradient } from "expo-linear-gradient";
 
 import API from "../services/api";
 import { AppContext } from "../context/AppContext";
+import { FEATURES } from "../config/features";
 import { COLORS, GRADIENTS } from "../utils/colors";
 import { RADIUS, SHADOWS, SPACING, TYPE } from "../utils/theme";
 
@@ -131,13 +132,15 @@ export default function HomeScreen({ navigation }) {
             <Text style={styles.metaText}>{city}</Text>
           </View>
         </View>
-        <TouchableOpacity style={styles.bell} onPress={() => goTab("Community")} hitSlop={6}>
-          <Ionicons name="notifications-outline" size={20} color={COLORS.white} />
-        </TouchableOpacity>
+        {FEATURES.COMMUNITY && (
+          <TouchableOpacity style={styles.bell} onPress={() => goTab("Community")} hitSlop={6}>
+            <Ionicons name="notifications-outline" size={20} color={COLORS.white} />
+          </TouchableOpacity>
+        )}
       </LinearGradient>
 
       <View style={styles.quickRow}>
-        {QUICK_ACTIONS.map((q) => (
+        {QUICK_ACTIONS.filter((q) => q.key !== "Community" || FEATURES.COMMUNITY).map((q) => (
           <TouchableOpacity
             key={q.key}
             style={styles.quickTile}
@@ -157,28 +160,32 @@ export default function HomeScreen({ navigation }) {
         <Text style={styles.tipText}>{tip}</Text>
       </View>
 
-      <View style={styles.sectionRow}>
-        <Text style={styles.sectionTitle}>Healthy Urban Living</Text>
-        <TouchableOpacity onPress={() => navigation.navigate("UrbanLivingScreen")}>
-          <Text style={styles.seeAll}>Open</Text>
-        </TouchableOpacity>
-      </View>
-      <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.urbanRow}>
-        {URBAN_CARDS.map((c) => (
-          <TouchableOpacity
-            key={c.title}
-            style={[styles.urbanCard, { backgroundColor: c.tint }]}
-            onPress={() => navigation.navigate("UrbanLivingScreen")}
-            activeOpacity={0.85}
-          >
-            <View style={[styles.urbanIcon, { backgroundColor: c.color }]}>
-              <Ionicons name={c.icon} size={14} color={COLORS.white} />
-            </View>
-            <Text numberOfLines={1} style={styles.urbanTitle}>{c.title}</Text>
-            <Text numberOfLines={2} style={styles.urbanSub}>{c.sub}</Text>
-          </TouchableOpacity>
-        ))}
-      </ScrollView>
+      {FEATURES.WELLNESS && (
+        <>
+          <View style={styles.sectionRow}>
+            <Text style={styles.sectionTitle}>Healthy Urban Living</Text>
+            <TouchableOpacity onPress={() => navigation.navigate("UrbanLivingScreen")}>
+              <Text style={styles.seeAll}>Open</Text>
+            </TouchableOpacity>
+          </View>
+          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.urbanRow}>
+            {URBAN_CARDS.map((c) => (
+              <TouchableOpacity
+                key={c.title}
+                style={[styles.urbanCard, { backgroundColor: c.tint }]}
+                onPress={() => navigation.navigate("UrbanLivingScreen")}
+                activeOpacity={0.85}
+              >
+                <View style={[styles.urbanIcon, { backgroundColor: c.color }]}>
+                  <Ionicons name={c.icon} size={14} color={COLORS.white} />
+                </View>
+                <Text numberOfLines={1} style={styles.urbanTitle}>{c.title}</Text>
+                <Text numberOfLines={2} style={styles.urbanSub}>{c.sub}</Text>
+              </TouchableOpacity>
+            ))}
+          </ScrollView>
+        </>
+      )}
 
       <View style={styles.sectionRow}>
         <Text style={styles.sectionTitle}>Picks for {city}</Text>

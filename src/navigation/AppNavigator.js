@@ -20,6 +20,7 @@ import CommunitiesHubScreen from "../screens/CommunitiesHubScreen";
 import AchievementsScreen from "../screens/AchievementsScreen";
 
 import { AppContext } from "../context/AppContext";
+import { FEATURES } from "../config/features";
 import { COLORS } from "../utils/colors";
 
 const Tab = createBottomTabNavigator();
@@ -58,7 +59,9 @@ function Tabs() {
       <Tab.Screen name="Shop" component={ShopScreen} options={{ title: "Shop" }} />
       <Tab.Screen name="Garden" component={PlantTrackingScreen} options={{ title: "Garden" }} />
       <Tab.Screen name="Orders" component={OrderTrackingScreen} options={{ title: "Orders" }} />
-      <Tab.Screen name="Community" component={CommunityForumScreen} options={{ title: "Forum" }} />
+      {FEATURES.COMMUNITY && (
+        <Tab.Screen name="Community" component={CommunityForumScreen} options={{ title: "Forum" }} />
+      )}
       <Tab.Screen name="Profile" component={ProfileScreen} options={{ title: "Profile" }} />
     </Tab.Navigator>
   );
@@ -80,14 +83,26 @@ export default function AppNavigator() {
             <Stack.Screen name="CartScreen" component={CartScreen} />
             <Stack.Screen name="ShopScreen" component={ShopScreen} />
             <Stack.Screen name="GardenScreen" component={PlantTrackingScreen} />
-            <Stack.Screen name="CommunityForumScreen" component={CommunityForumScreen} />
-            <Stack.Screen name="InstructorBookingScreen" component={InstructorBookingScreen} />
+            {FEATURES.COMMUNITY && (
+              <Stack.Screen name="CommunityForumScreen" component={CommunityForumScreen} />
+            )}
+            {FEATURES.EXPERTS && (
+              <Stack.Screen name="InstructorBookingScreen" component={InstructorBookingScreen} />
+            )}
             <Stack.Screen name="PlantTrackingScreen" component={PlantTrackingScreen} />
             <Stack.Screen name="WishlistScreen" component={WishlistScreen} />
-            <Stack.Screen name="FuturePlantsScreen" component={FuturePlantsScreen} />
-            <Stack.Screen name="UrbanLivingScreen" component={UrbanLivingScreen} />
-            <Stack.Screen name="CommunitiesHubScreen" component={CommunitiesHubScreen} />
-            <Stack.Screen name="AchievementsScreen" component={AchievementsScreen} />
+            {FEATURES.FUTURE_PLANTS && (
+              <Stack.Screen name="FuturePlantsScreen" component={FuturePlantsScreen} />
+            )}
+            {FEATURES.WELLNESS && (
+              <Stack.Screen name="UrbanLivingScreen" component={UrbanLivingScreen} />
+            )}
+            {FEATURES.COMMUNITY && (
+              <Stack.Screen name="CommunitiesHubScreen" component={CommunitiesHubScreen} />
+            )}
+            {FEATURES.REWARDS && (
+              <Stack.Screen name="AchievementsScreen" component={AchievementsScreen} />
+            )}
           </>
         )}
       </Stack.Navigator>
